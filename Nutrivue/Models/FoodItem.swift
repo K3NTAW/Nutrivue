@@ -3,7 +3,7 @@ import SwiftData
 
 @Model
 class FoodItem {
-    let id: UUID
+    var id: UUID
     var name: String
     var calories: Double
     var protein: Double

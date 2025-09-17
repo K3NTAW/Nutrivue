@@ -3,7 +3,7 @@ import SwiftData
 
 @Model
 class Meal {
-    let id: UUID
+    var id: UUID
     var name: String
     @Relationship(deleteRule: .cascade) var items: [FoodItem]
     var date: Date

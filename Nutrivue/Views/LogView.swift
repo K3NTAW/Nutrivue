@@ -9,7 +9,6 @@ struct LogView: View {
     @State private var showingScannerSheet = false
     @State private var showingFoodSearchSheet = false
     @State private var selectedMeal: Meal?
-    @State private var scannedBarcode: String?
     
     @StateObject private var foodLookupViewModel = FoodLookupViewModel()
     
@@ -44,7 +43,7 @@ struct LogView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showingAddFoodSheet) {
+            .sheet(isPresented: $showingAddFoodSheet, onDismiss: resetScanState) {
                 if let selectedMeal {
                     AddFoodView(meal: selectedMeal, product: foodLookupViewModel.product)
                 }
@@ -55,23 +54,66 @@ struct LogView: View {
                 }
             }
             .sheet(isPresented: $showingScannerSheet) {
-                BarcodeScannerView(scannedCode: $scannedBarcode)
-            }
-            .onAppear(perform: createTodaysMealsIfNeeded)
-            .onChange(of: scannedBarcode) {
-                if let barcode = scannedBarcode {
+                BarcodeScannerView { barcode in
+                    // This closure is called when a barcode is successfully scanned.
+                    
+                    // Add haptic feedback
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    
+                    // Dismiss the scanner
+                    showingScannerSheet = false
+                    
+                    // Start the product lookup
                     foodLookupViewModel.fetchProduct(barcode: barcode)
                 }
             }
+            .onAppear(perform: createTodaysMealsIfNeeded)
             .onChange(of: foodLookupViewModel.product) {
                 if foodLookupViewModel.product != nil {
                     // This logic now correctly triggers only for barcode scans.
-                    // We need a selected meal to add to. Defaulting to the first meal of the day.
                     selectedMeal = todaysMeals.first
                     showingAddFoodSheet = true
                 }
             }
+            .alert("Product Not Found", isPresented: $foodLookupViewModel.productNotFound) {
+                Button("Add Manually") {
+                    selectedMeal = todaysMeals.first
+                    foodLookupViewModel.product = nil // Ensure we are in manual mode
+                    showingAddFoodSheet = true
+                }
+                Button("OK", role: .cancel) {
+                    resetScanState()
+                }
+            }
+            .alert("Error", isPresented: .constant(foodLookupViewModel.errorMessage != nil), actions: {
+                Button("OK", role: .cancel) {
+                    resetScanState()
+                    foodLookupViewModel.errorMessage = nil
+                }
+            }, message: {
+                Text(foodLookupViewModel.errorMessage ?? "An unknown error occurred.")
+            })
+            .overlay {
+                if foodLookupViewModel.isLoading {
+                    ZStack {
+                        Color(white: 0, opacity: 0.75)
+                            .ignoresSafeArea()
+                        VStack {
+                            ProgressView()
+                                .tint(.white)
+                            Text("Searching...")
+                                .foregroundColor(.white)
+                                .padding(.top)
+                        }
+                    }
+                }
+            }
         }
+    }
+    
+    private func resetScanState() {
+        foodLookupViewModel.product = nil
+        foodLookupViewModel.productNotFound = false
     }
     
     private func createTodaysMealsIfNeeded() {
@@ -90,3 +132,5 @@ struct LogView: View {
     LogView()
         .modelContainer(for: [Meal.self, FoodItem.self], inMemory: true)
 }
+
+

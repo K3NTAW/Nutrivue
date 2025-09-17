@@ -50,7 +50,7 @@ struct SettingsView: View {
                     }
                 }
                 
-                if let user = user {
+                if user != nil {
                     Section(header: Text("Preferences")) {
                         Picker("Units", selection: $unitSystem) {
                             ForEach(UnitSystem.allCases, id: \.self) { system in

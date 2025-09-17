@@ -2,10 +2,10 @@ import SwiftUI
 
 struct FoodSearchView: View {
     @Environment(\.dismiss) var dismiss
-    @Environment(\.modelContext) private var modelContext
     
     @StateObject private var viewModel = FoodSearchViewModel()
     @State private var showingAddFoodManually = false
+    @State private var selectedProduct: ProductData?
     
     let meal: Meal
     
@@ -18,7 +18,7 @@ struct FoodSearchView: View {
                 
                 List(viewModel.searchResults) { product in
                     Button(action: {
-                        add(product: product)
+                        selectedProduct = product
                     }) {
                         Text(product.productName ?? "Unknown Food")
                     }
@@ -39,18 +39,9 @@ struct FoodSearchView: View {
             .sheet(isPresented: $showingAddFoodManually) {
                 AddFoodView(meal: meal, product: nil)
             }
+            .sheet(item: $selectedProduct) { product in
+                AddFoodView(meal: meal, product: product)
+            }
         }
-    }
-    
-    private func add(product: ProductData) {
-        let foodItem = FoodItem(
-            name: product.productName ?? "Unknown",
-            calories: product.nutriments?.energyKcal100g ?? 0,
-            protein: product.nutriments?.proteins100g ?? 0,
-            carbohydrates: product.nutriments?.carbohydrates100g ?? 0,
-            fat: product.nutriments?.fat100g ?? 0
-        )
-        meal.items.append(foodItem)
-        dismiss()
     }
 }

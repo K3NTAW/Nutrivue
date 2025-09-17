@@ -2,9 +2,9 @@ import SwiftUI
 import VisionKit
 
 struct BarcodeScannerView: UIViewControllerRepresentable {
-    @Binding var scannedCode: String?
-    @Environment(\.dismiss) var dismiss
-
+    
+    var didFindBarcode: (String) -> Void
+    
     func makeUIViewController(context: Context) -> DataScannerViewController {
         let viewController = DataScannerViewController(
             recognizedDataTypes: [.barcode()],
@@ -12,39 +12,56 @@ struct BarcodeScannerView: UIViewControllerRepresentable {
             isHighlightingEnabled: true
         )
         viewController.delegate = context.coordinator
+        
+        try? viewController.startScanning()
+        
         return viewController
     }
-
+    
     func updateUIViewController(_ uiViewController: DataScannerViewController, context: Context) {
-        // No update needed
+        // This is the crucial missing line that keeps the coordinator updated.
+        context.coordinator.parent = self
     }
-
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-
+    
     class Coordinator: NSObject, DataScannerViewControllerDelegate {
         var parent: BarcodeScannerView
-
+        
         init(_ parent: BarcodeScannerView) {
             self.parent = parent
         }
-
+        
         func dataScanner(_ dataScanner: DataScannerViewController, didTapOn item: RecognizedItem) {
-            handle(item: item)
+            process(item: item, scanner: dataScanner)
         }
         
         func dataScanner(_ dataScanner: DataScannerViewController, didAdd addedItems: [RecognizedItem], allItems: [RecognizedItem]) {
             guard let item = addedItems.first else { return }
-            handle(item: item)
+            process(item: item, scanner: dataScanner)
         }
-
-        private func handle(item: RecognizedItem) {
-            guard let barcode = item as? RecognizedItem.Barcode else { return }
+        
+        func process(item: RecognizedItem, scanner: DataScannerViewController) {
             
-            if let code = barcode.observation.payloadStringValue {
-                parent.scannedCode = code
-                parent.dismiss()
+            var barcodePayload: String?
+            
+            switch item {
+            case .barcode(let barcode):
+                barcodePayload = barcode.observation.payloadStringValue
+            case .text(let text):
+                barcodePayload = text.transcript
+            @unknown default:
+                break
+            }
+            
+            guard let payload = barcodePayload else { return }
+            
+            scanner.stopScanning()
+            
+            DispatchQueue.main.async {
+                self.parent.didFindBarcode(payload)
             }
         }
     }

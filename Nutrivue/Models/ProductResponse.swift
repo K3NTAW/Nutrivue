@@ -11,7 +11,7 @@ struct ProductSearchResponse: Codable {
 }
 
 struct ProductData: Codable, Equatable, Identifiable {
-    var id: String { productName ?? UUID().uuidString }
+    let id = UUID()
     let productName: String?
     let nutriments: Nutriments?
 

@@ -3,7 +3,7 @@ import SwiftData
 
 @Model
 class User {
-    let id: UUID
+    var id: UUID
     var age: Int
     var gender: Gender
     var weight: Double // in kg
