@@ -2,7 +2,6 @@ import SwiftUI
 import SwiftData
 
 struct LogView: View {
-    @Environment(\.modelContext) private var modelContext
     @Query(sort: \Meal.date) private var meals: [Meal]
     
     @State private var showingAddFoodSheet = false
@@ -24,6 +23,10 @@ struct LogView: View {
                         ForEach(meal.items) { item in
                             Text(item.name)
                         }
+                        .onDelete { indexSet in
+                            deleteFoodItem(from: meal, at: indexSet)
+                        }
+                        
                         Button(action: {
                             selectedMeal = meal
                             showingFoodSearchSheet.toggle()
@@ -67,7 +70,6 @@ struct LogView: View {
                     foodLookupViewModel.fetchProduct(barcode: barcode)
                 }
             }
-            .onAppear(perform: createTodaysMealsIfNeeded)
             .onChange(of: foodLookupViewModel.product) {
                 if foodLookupViewModel.product != nil {
                     // This logic now correctly triggers only for barcode scans.
@@ -111,20 +113,15 @@ struct LogView: View {
         }
     }
     
+    private func deleteFoodItem(from meal: Meal, at offsets: IndexSet) {
+        meal.items.remove(atOffsets: offsets)
+    }
+    
     private func resetScanState() {
         foodLookupViewModel.product = nil
         foodLookupViewModel.productNotFound = false
     }
     
-    private func createTodaysMealsIfNeeded() {
-        if todaysMeals.isEmpty {
-            let mealNames = ["Breakfast", "Lunch", "Dinner", "Snacks"]
-            for name in mealNames {
-                let newMeal = Meal(name: name, items: [], date: Date())
-                modelContext.insert(newMeal)
-            }
-        }
-    }
 }
 
 

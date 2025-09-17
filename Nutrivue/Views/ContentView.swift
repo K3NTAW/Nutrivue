@@ -11,8 +11,13 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query var users: [User]
+    @Query(sort: \Meal.date) private var meals: [Meal]
     @State private var showOnboarding = false
 
+    private var todaysMeals: [Meal] {
+        meals.filter { Calendar.current.isDateInToday($0.date) }
+    }
+    
     var body: some View {
         if users.isEmpty {
             // Show a placeholder while checking for user,
@@ -44,6 +49,17 @@ struct ContentView: View {
                     .tabItem {
                         Label("Settings", systemImage: "gear")
                     }
+            }
+            .onAppear(perform: createTodaysMealsIfNeeded)
+        }
+    }
+    
+    private func createTodaysMealsIfNeeded() {
+        if todaysMeals.isEmpty {
+            let mealNames = ["Breakfast", "Lunch", "Dinner", "Snacks"]
+            for name in mealNames {
+                let newMeal = Meal(name: name, items: [], date: Date())
+                modelContext.insert(newMeal)
             }
         }
     }
