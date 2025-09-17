@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3878DB172E7AEAE2005F4FE3 /* OpenFoodFactsSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 3878DB162E7AEAE2005F4FE3 /* OpenFoodFactsSDK */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		3878DAC82E7AE4C1005F4FE3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,9 +33,22 @@
 		3878DAD12E7AE4C1005F4FE3 /* NutrivueUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NutrivueUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3878DB142E7AEAAC005F4FE3 /* Exceptions for "Nutrivue" folder in "Nutrivue" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ContentView.swift,
+			);
+			target = 3878DAB82E7AE4BF005F4FE3 /* Nutrivue */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3878DABB2E7AE4BF005F4FE3 /* Nutrivue */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3878DB142E7AEAAC005F4FE3 /* Exceptions for "Nutrivue" folder in "Nutrivue" target */,
+			);
 			path = Nutrivue;
 			sourceTree = "<group>";
 		};
@@ -52,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3878DB172E7AEAE2005F4FE3 /* OpenFoodFactsSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +96,7 @@
 				3878DABB2E7AE4BF005F4FE3 /* Nutrivue */,
 				3878DACA2E7AE4C1005F4FE3 /* NutrivueTests */,
 				3878DAD42E7AE4C1005F4FE3 /* NutrivueUITests */,
+				3878DB152E7AEAE2005F4FE3 /* Frameworks */,
 				3878DABA2E7AE4BF005F4FE3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +109,13 @@
 				3878DAD12E7AE4C1005F4FE3 /* NutrivueUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		3878DB152E7AEAE2005F4FE3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +138,7 @@
 			);
 			name = Nutrivue;
 			packageProductDependencies = (
+				3878DB162E7AEAE2005F4FE3 /* OpenFoodFactsSDK */,
 			);
 			productName = Nutrivue;
 			productReference = 3878DAB92E7AE4BF005F4FE3 /* Nutrivue.app */;
@@ -195,6 +222,9 @@
 			);
 			mainGroup = 3878DAB02E7AE4BF005F4FE3;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3878DB0F2E7AE9C5005F4FE3 /* XCRemoteSwiftPackageReference "openfoodfacts-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3878DABA2E7AE4BF005F4FE3 /* Products */;
 			projectDirPath = "";
@@ -397,6 +427,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Nutrivue needs access to your camera to scan food barcodes.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrivue needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -416,10 +448,11 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Debug;
@@ -436,6 +469,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Nutrivue needs access to your camera to scan food barcodes.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrivue needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -455,10 +490,11 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Release;
@@ -593,6 +629,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3878DB0F2E7AE9C5005F4FE3 /* XCRemoteSwiftPackageReference "openfoodfacts-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/openfoodfacts/openfoodfacts-swift";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3878DB162E7AEAE2005F4FE3 /* OpenFoodFactsSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3878DB0F2E7AE9C5005F4FE3 /* XCRemoteSwiftPackageReference "openfoodfacts-swift" */;
+			productName = OpenFoodFactsSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3878DAB12E7AE4BF005F4FE3 /* Project object */;
 }

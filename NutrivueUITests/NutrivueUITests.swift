@@ -23,19 +23,31 @@ final class NutrivueUITests: XCTestCase {
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
+    func testOnboardingFlow() throws {
         let app = XCUIApplication()
         app.launch()
+        
+        // Onboarding screen should be presented
+        XCTAssert(app.navigationBars["Tell us about you"].waitForExistence(timeout: 5))
+        
+        app.textFields["Age"].tap()
+        app.textFields["Age"].typeText("30")
+        
+        app.buttons["gender_picker"].tap()
+        app.buttons["Male"].tap()
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
+        app.textFields["Weight (kg)"].tap()
+        app.textFields["Weight (kg)"].typeText("80")
+        
+        app.textFields["Height (cm)"].tap()
+        app.textFields["Height (cm)"].typeText("180")
+        
+        app.buttons["activity_level_picker"].tap()
+        app.buttons["Sedentary"].tap()
 
-    @MainActor
-    func testLaunchPerformance() throws {
-        // This measures how long it takes to launch your application.
-        measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
-        }
+        app.buttons["Save and Continue"].tap()
+        
+        // After onboarding, the dashboard should be visible
+        XCTAssert(app.navigationBars["Dashboard"].waitForExistence(timeout: 5))
     }
 }

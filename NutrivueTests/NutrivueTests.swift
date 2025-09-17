@@ -6,11 +6,30 @@
 //
 
 import Testing
+@testable import Nutrivue
 
 struct NutrivueTests {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    let goalService = GoalService()
+
+    @Test func testBMRCalculationForMale() {
+        let user = User(age: 30, gender: .male, weight: 80, height: 180, activityLevel: .sedentary, goals: nil)
+        let goals = goalService.calculateGoals(for: user)
+        
+        // BMR = 10 * 80 + 6.25 * 180 - 5 * 30 + 5 = 800 + 1125 - 150 + 5 = 1780
+        // TDEE = 1780 * 1.2 = 2136
+        
+        #expect(goals.calories == 2136)
+    }
+    
+    @Test func testBMRCalculationForFemale() {
+        let user = User(age: 25, gender: .female, weight: 60, height: 165, activityLevel: .moderate, goals: nil)
+        let goals = goalService.calculateGoals(for: user)
+        
+        // BMR = 10 * 60 + 6.25 * 165 - 5 * 25 - 161 = 600 + 1031.25 - 125 - 161 = 1345.25
+        // TDEE = 1345.25 * 1.55 = 2085.1375
+        
+        #expect(goals.calories > 2085 && goals.calories < 2086)
     }
 
 }
