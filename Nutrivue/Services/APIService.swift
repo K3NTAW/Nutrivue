@@ -1,7 +1,14 @@
 import Foundation
 
 class APIService {
+    
+    private var cache = [String: ProductData]()
+    
     func fetchProduct(barcode: String) async throws -> ProductData? {
+        if let cachedProduct = cache[barcode] {
+            return cachedProduct
+        }
+        
         let urlString = "https://world.openfoodfacts.org/api/v2/product/\(barcode).json"
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -11,6 +18,10 @@ class APIService {
         
         let decoder = JSONDecoder()
         let response = try decoder.decode(ProductResponse.self, from: data)
+        
+        if let product = response.product {
+            cache[barcode] = product
+        }
         
         return response.product
     }
