@@ -12,11 +12,15 @@ struct ProductSearchResponse: Codable {
 
 struct ProductData: Codable, Equatable, Identifiable {
     let id = UUID()
+    let code: String?
     let productName: String?
+    let imageUrl: String?
     let nutriments: Nutriments?
 
     enum CodingKeys: String, CodingKey {
+        case code
         case productName = "product_name"
+        case imageUrl = "image_url"
         case nutriments
     }
 }

@@ -8,9 +8,10 @@ struct LogView: View {
     // Use item-bound sheets to avoid race where content evaluates with nil meal on first presentation
     @State private var mealForSearch: Meal?
     @State private var mealForAdd: Meal?
+    @State private var showingMealPicker = false
     
     @StateObject private var foodLookupViewModel = FoodLookupViewModel()
-    @StateObject private var foodSearchViewModel = FoodSearchViewModel()
+    @StateObject private var foodSearchViewModel = SearchViewModel()
     
     private var todaysMeals: [Meal] {
         meals.filter { Calendar.current.isDateInToday($0.date) }
@@ -74,13 +75,22 @@ struct LogView: View {
             }
             .onChange(of: foodLookupViewModel.product) {
                 if foodLookupViewModel.product != nil {
-                    // This logic now correctly triggers only for barcode scans.
-                    mealForAdd = todaysMeals.first
+                    // Product loaded from scan → ask user which meal to add to
+                    showingMealPicker = true
                 }
+            }
+            .confirmationDialog("Choose Meal", isPresented: $showingMealPicker, titleVisibility: .visible) {
+                ForEach(todaysMeals) { meal in
+                    Button(meal.name) {
+                        mealForAdd = meal
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
             }
             .alert("Product Not Found", isPresented: $foodLookupViewModel.productNotFound) {
                 Button("Add Manually") {
-                    mealForAdd = todaysMeals.first
+                    // Ask for meal even for manual entry
+                    showingMealPicker = true
                     foodLookupViewModel.product = nil // Ensure we are in manual mode
                 }
                 Button("OK", role: .cancel) {
