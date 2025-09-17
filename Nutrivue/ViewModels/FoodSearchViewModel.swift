@@ -11,10 +11,14 @@ class FoodSearchViewModel: ObservableObject {
     @Published var errorMessage: String?
     
     private var cancellables = Set<AnyCancellable>()
-    
-    init() {
+    private var hasActivated = false
+
+    func activate() {
+        guard !hasActivated else { return }
+        hasActivated = true
+        
         $searchQuery
-            .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
+            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
             .removeDuplicates()
             .filter { !$0.isEmpty }
             .sink { [weak self] query in

@@ -4,12 +4,13 @@ import SwiftData
 struct LogView: View {
     @Query(sort: \Meal.date) private var meals: [Meal]
     
-    @State private var showingAddFoodSheet = false
     @State private var showingScannerSheet = false
-    @State private var showingFoodSearchSheet = false
-    @State private var selectedMeal: Meal?
+    // Use item-bound sheets to avoid race where content evaluates with nil meal on first presentation
+    @State private var mealForSearch: Meal?
+    @State private var mealForAdd: Meal?
     
     @StateObject private var foodLookupViewModel = FoodLookupViewModel()
+    @StateObject private var foodSearchViewModel = FoodSearchViewModel()
     
     private var todaysMeals: [Meal] {
         meals.filter { Calendar.current.isDateInToday($0.date) }
@@ -28,8 +29,7 @@ struct LogView: View {
                         }
                         
                         Button(action: {
-                            selectedMeal = meal
-                            showingFoodSearchSheet.toggle()
+                            mealForSearch = meal
                         }) {
                             Label("Add Food", systemImage: "plus")
                         }
@@ -46,15 +46,17 @@ struct LogView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showingAddFoodSheet, onDismiss: resetScanState) {
-                if let selectedMeal {
-                    AddFoodView(meal: selectedMeal, product: foodLookupViewModel.product)
-                }
+            .sheet(item: $mealForSearch, onDismiss: {
+                // Reset search state when the sheet is closed
+                foodSearchViewModel.searchResults = []
+                foodSearchViewModel.searchQuery = ""
+            }) { meal in
+                FoodSearchView(viewModel: foodSearchViewModel, meal: meal)
             }
-            .sheet(isPresented: $showingFoodSearchSheet) {
-                if let selectedMeal {
-                    FoodSearchView(meal: selectedMeal)
-                }
+            .sheet(item: $mealForAdd, onDismiss: {
+                resetScanState()
+            }) { meal in
+                AddFoodView(meal: meal, product: foodLookupViewModel.product)
             }
             .sheet(isPresented: $showingScannerSheet) {
                 BarcodeScannerView { barcode in
@@ -73,15 +75,13 @@ struct LogView: View {
             .onChange(of: foodLookupViewModel.product) {
                 if foodLookupViewModel.product != nil {
                     // This logic now correctly triggers only for barcode scans.
-                    selectedMeal = todaysMeals.first
-                    showingAddFoodSheet = true
+                    mealForAdd = todaysMeals.first
                 }
             }
             .alert("Product Not Found", isPresented: $foodLookupViewModel.productNotFound) {
                 Button("Add Manually") {
-                    selectedMeal = todaysMeals.first
+                    mealForAdd = todaysMeals.first
                     foodLookupViewModel.product = nil // Ensure we are in manual mode
-                    showingAddFoodSheet = true
                 }
                 Button("OK", role: .cancel) {
                     resetScanState()

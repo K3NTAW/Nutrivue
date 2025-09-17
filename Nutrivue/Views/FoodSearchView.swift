@@ -3,7 +3,7 @@ import SwiftUI
 struct FoodSearchView: View {
     @Environment(\.dismiss) var dismiss
     
-    @StateObject private var viewModel = FoodSearchViewModel()
+    @ObservedObject var viewModel: FoodSearchViewModel
     @State private var showingAddFoodManually = false
     @State private var selectedProduct: ProductData?
     
@@ -26,6 +26,9 @@ struct FoodSearchView: View {
             }
             .navigationTitle("Search Food")
             .searchable(text: $viewModel.searchQuery)
+            .onSubmit(of: .search) {
+                viewModel.performSearch(query: viewModel.searchQuery)
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -41,6 +44,9 @@ struct FoodSearchView: View {
             }
             .sheet(item: $selectedProduct) { product in
                 AddFoodView(meal: meal, product: product)
+            }
+            .onAppear {
+                viewModel.activate()
             }
         }
     }

@@ -13,7 +13,7 @@ struct ContentView: View {
     @Query var users: [User]
     @Query(sort: \Meal.date) private var meals: [Meal]
     @State private var showOnboarding = false
-
+    
     private var todaysMeals: [Meal] {
         meals.filter { Calendar.current.isDateInToday($0.date) }
     }
