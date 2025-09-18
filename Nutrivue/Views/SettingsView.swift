@@ -18,11 +18,9 @@ struct SettingsView: View {
                     if viewModel.isHealthKitAuthorized {
                         Text("Apple Health Connected")
                             .foregroundColor(.green)
-                        
-                        Button("Sync Health Data") {
-                            viewModel.fetchHealthData()
-                        }
-                        
+                        Text("Syncs automatically")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     } else {
                         Button("Connect to Apple Health") {
                             viewModel.authorizeHealthKit()
@@ -111,6 +109,14 @@ struct SettingsView: View {
             .onAppear {
                 loadUserData()
                 viewModel.refreshHealthKitAuthorizationState()
+                if viewModel.isHealthKitAuthorized {
+                    viewModel.fetchHealthData()
+                }
+            }
+            .onChange(of: viewModel.isHealthKitAuthorized) { newValue in
+                if newValue {
+                    viewModel.fetchHealthData()
+                }
             }
             .alert("Preferences Saved", isPresented: $showingSaveConfirmation) {
                 Button("OK", role: .cancel) { }

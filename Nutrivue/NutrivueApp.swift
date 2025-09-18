@@ -10,9 +10,15 @@ import SwiftData
 
 @main
 struct NutrivueApp: App {
+    @Environment(\.modelContext) private var modelContext
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    // Background health sync at app start
+                    let sync = HealthSyncService(modelContext: modelContext)
+                    sync.syncIfAuthorized()
+                }
         }
         .modelContainer(for: [User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self])
     }
