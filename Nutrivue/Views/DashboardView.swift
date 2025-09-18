@@ -6,6 +6,7 @@ struct DashboardView: View {
     private var user: User? { users.first }
     
     @Query(sort: \Meal.date) private var meals: [Meal]
+    @Query private var supplements: [Supplement]
     private var todaysMeals: [Meal] {
         meals.filter { Calendar.current.isDateInToday($0.date) }
     }
@@ -87,6 +88,33 @@ struct DashboardView: View {
                             .padding()
                     }
                     
+                    // Supplements Today
+                    GroupBox {
+                        VStack(spacing: 12) {
+                            if supplementsForToday.isEmpty {
+                                HStack {
+                                    Image(systemName: "capsule")
+                                        .foregroundColor(.secondary)
+                                    Text("No supplements scheduled today")
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                }
+                                .padding(.vertical, 4)
+                            } else {
+                                ForEach(supplementsForToday) { supp in
+                                    SupplementCard(supplement: supp)
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "pills")
+                            Text("Supplements Today")
+                                .font(.headline)
+                            Spacer()
+                        }
+                    }
+                    
                     Spacer()
                 }
                 .id(totalFoodItemsToday)
@@ -95,6 +123,101 @@ struct DashboardView: View {
             .navigationTitle("Dashboard")
             .navigationBarHidden(true)
         }
+    }
+}
+
+private extension DashboardView {
+    var supplementsForToday: [Supplement] {
+        supplements.filter { $0.isScheduledForToday() }
+    }
+}
+
+private struct SupplementCard: View {
+    @Environment(\.modelContext) private var modelContext
+    let supplement: Supplement
+    @State private var isTaken: Bool = false
+    
+    var body: some View {
+        HStack(alignment: .center, spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(isTaken ? Color.green.opacity(0.15) : Color.accentColor.opacity(0.15))
+                    .frame(width: 36, height: 36)
+                Image(systemName: isTaken ? "checkmark" : "capsule")
+                    .foregroundColor(isTaken ? .green : .accentColor)
+                    .imageScale(.medium)
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                Text(supplement.name)
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+                HStack(spacing: 8) {
+                    if let dosage = supplement.dosage, !dosage.isEmpty {
+                        ChipView(icon: "pills", text: dosage)
+                    }
+                    if let t = supplement.timeComponents(), let hour = t.hour, let minute = t.minute {
+                        ChipView(icon: "clock", text: String(format: "%02d:%02d", hour, minute))
+                    }
+                }
+            }
+            Spacer(minLength: 12)
+            Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { toggleTaken() } }) {
+                Image(systemName: isTaken ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundColor(isTaken ? .green : Color(.tertiaryLabel))
+                    .accessibilityLabel(isTaken ? "Marked taken" : "Mark as taken")
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color(.secondarySystemBackground))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color(.separator).opacity(0.25), lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
+        .onAppear { isTaken = supplement.wasTakenToday() }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(AccessibilityStringBuilder.describe(supplement: supplement, isTaken: isTaken))
+    }
+    
+    private func toggleTaken() {
+        if isTaken { return }
+        let intake = SupplementIntake(supplementID: supplement.id, date: Date())
+        supplement.intakes.append(intake)
+        isTaken = true
+    }
+}
+
+private struct ChipView: View {
+    let icon: String
+    let text: String
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon).font(.caption2)
+            Text(text).font(.caption)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            Capsule().fill(Color(.tertiarySystemFill))
+        )
+        .foregroundStyle(.secondary)
+    }
+}
+
+private enum AccessibilityStringBuilder {
+    static func describe(supplement: Supplement, isTaken: Bool) -> String {
+        var parts: [String] = [supplement.name]
+        if let dosage = supplement.dosage, !dosage.isEmpty { parts.append(dosage) }
+        if let t = supplement.timeComponents(), let h = t.hour, let m = t.minute {
+            parts.append(String(format: "%02d:%02d", h, m))
+        }
+        parts.append(isTaken ? "Taken" : "Not taken")
+        return parts.joined(separator: ", ")
     }
 }
 

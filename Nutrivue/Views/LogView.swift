@@ -9,6 +9,9 @@ struct LogView: View {
     @State private var mealForSearch: Meal?
     @State private var mealForAdd: Meal?
     @State private var showingMealPicker = false
+    @State private var showingRecipePicker = false
+    @State private var selectedRecipe: Recipe?
+    @State private var mealForRecipe: Meal?
     
     @StateObject private var foodLookupViewModel = FoodLookupViewModel()
     @StateObject private var foodSearchViewModel = SearchViewModel()
@@ -29,6 +32,12 @@ struct LogView: View {
                             deleteFoodItem(from: meal, at: indexSet)
                         }
                         
+                        Button(action: {
+                            mealForRecipe = meal
+                            showingRecipePicker = true
+                        }) {
+                            Label("Add Recipe", systemImage: "book")
+                        }
                         Button(action: {
                             mealForSearch = meal
                         }) {
@@ -97,6 +106,23 @@ struct LogView: View {
                     resetScanState()
                 }
             }
+            .sheet(isPresented: $showingRecipePicker) {
+                RecipePickerView(onPick: { recipe in
+                    selectedRecipe = recipe
+                }, onCancel: {
+                    selectedRecipe = nil
+                })
+            }
+            .sheet(item: $selectedRecipe) { recipe in
+                AdjustRecipeServingsView(recipe: recipe, defaultServings: recipe.servings) { servings in
+                    if let targetMeal = mealForRecipe {
+                        let n = recipe.scaledNutrition(servings: servings)
+                        let item = FoodItem(name: recipe.name, calories: n.cal, protein: n.p, carbohydrates: n.c, fat: n.f)
+                        targetMeal.items.append(item)
+                    }
+                    mealForRecipe = nil
+                }
+            }
             .alert("Error", isPresented: .constant(foodLookupViewModel.errorMessage != nil), actions: {
                 Button("OK", role: .cancel) {
                     resetScanState()
@@ -133,6 +159,8 @@ struct LogView: View {
     }
     
 }
+
+// (Supplements removed from LogView)
 
 
 #Preview {

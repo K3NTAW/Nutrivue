@@ -14,6 +14,6 @@ struct NutrivueApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: [User.self, Meal.self, FoodItem.self, Goals.self])
+        .modelContainer(for: [User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self])
     }
 }

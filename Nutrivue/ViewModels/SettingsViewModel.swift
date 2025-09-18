@@ -27,6 +27,7 @@ class SettingsViewModel: ObservableObject {
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
+        refreshHealthKitAuthorizationState()
     }
     
     private func requestNotificationPermission() {
@@ -68,6 +69,14 @@ class SettingsViewModel: ObservableObject {
                 } else if let error = error {
                     self?.errorMessage = "HealthKit Authorization Failed: \(error.localizedDescription)"
                 }
+            }
+        }
+    }
+    
+    func refreshHealthKitAuthorizationState() {
+        healthKitService.checkAuthorizationStatus { [weak self] granted in
+            DispatchQueue.main.async {
+                self?.isHealthKitAuthorized = granted
             }
         }
     }

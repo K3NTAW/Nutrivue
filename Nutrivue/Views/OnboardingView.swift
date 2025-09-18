@@ -9,6 +9,7 @@ struct OnboardingView: View {
     @State private var height: String = ""
     @State private var gender: Gender = .male
     @State private var activityLevel: ActivityLevel = .sedentary
+    @State private var goalType: GoalService.GoalType = .maintain
     
     var body: some View {
         NavigationView {
@@ -38,6 +39,17 @@ struct OnboardingView: View {
                     .accessibilityIdentifier("activity_level_picker")
                 }
                 
+                Section(header: Text("Goal")) {
+                    Picker("Select Goal", selection: $goalType) {
+                        Text("Maintain").tag(GoalService.GoalType.maintain)
+                        Text("Lose Weight").tag(GoalService.GoalType.lose)
+                        Text("Gain Weight").tag(GoalService.GoalType.gain)
+                        Text("Build Muscle").tag(GoalService.GoalType.muscle)
+                    }
+                    .pickerStyle(.inline)
+                    .accessibilityIdentifier("goal_picker")
+                }
+                
                 Button(action: {
                     saveUser()
                 }) {
@@ -60,7 +72,7 @@ struct OnboardingView: View {
         let newUser = User(age: ageInt, gender: gender, weight: weightDouble, height: heightDouble, activityLevel: activityLevel, goals: nil, unitSystem: .metric, dietaryNotes: "")
         
         let goalService = GoalService()
-        let goals = goalService.calculateGoals(for: newUser)
+        let goals = goalService.calculateGoals(for: newUser, goal: goalType)
         newUser.goals = goals
         
         modelContext.insert(newUser)

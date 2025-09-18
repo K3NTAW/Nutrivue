@@ -20,31 +20,36 @@ struct ContentView: View {
     
     var body: some View {
         if users.isEmpty {
-            // Show a placeholder while checking for user,
-            // and trigger onboarding.
-            Color.white.onAppear {
-                showOnboarding = true
-            }
-            .sheet(isPresented: $showOnboarding) {
-                OnboardingView(showOnboarding: $showOnboarding)
-            }
+            // Trigger onboarding as a full-screen cover so nothing shows underneath
+            Color(.systemBackground)
+                .ignoresSafeArea()
+                .onAppear { showOnboarding = true }
+                .fullScreenCover(isPresented: $showOnboarding) {
+                    OnboardingView(showOnboarding: $showOnboarding)
+                        .interactiveDismissDisabled(true)
+                }
         } else {
             TabView {
                 DashboardView()
                     .tabItem {
                         Label("Dashboard", systemImage: "square.grid.2x2")
                     }
-                
+
+                RecipesView()
+                    .tabItem {
+                        Label("Recipes", systemImage: "book")
+                    }
+
                 LogView()
                     .tabItem {
                         Label("Log", systemImage: "plus.circle")
                     }
-                
-                HistoryView()
+
+                SupplementsView()
                     .tabItem {
-                        Label("History", systemImage: "calendar")
+                        Label("Supplements", systemImage: "pills")
                     }
-                
+
                 SettingsView(viewModel: SettingsViewModel(modelContext: modelContext))
                     .tabItem {
                         Label("Settings", systemImage: "gear")

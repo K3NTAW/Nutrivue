@@ -5,19 +5,34 @@ class HealthKitService {
     
     let healthStore = HKHealthStore()
     
+    private var defaultReadTypes: Set<HKObjectType> {
+        return [
+            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+            HKObjectType.quantityType(forIdentifier: .bodyMass)!
+        ]
+    }
+
     func requestAuthorization(completion: @escaping (Bool, Error?) -> Void) {
         guard HKHealthStore.isHealthDataAvailable() else {
             completion(false, NSError(domain: "com.nutrivue.healthkit", code: 1, userInfo: [NSLocalizedDescriptionKey: "Health data not available"]))
             return
         }
         
-        let typesToRead: Set<HKObjectType> = [
-            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
-            HKObjectType.quantityType(forIdentifier: .bodyMass)!
-        ]
-        
-        healthStore.requestAuthorization(toShare: nil, read: typesToRead) { success, error in
+        healthStore.requestAuthorization(toShare: nil, read: defaultReadTypes) { success, error in
             completion(success, error)
+        }
+    }
+
+    func checkAuthorizationStatus(completion: @escaping (Bool) -> Void) {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            completion(false)
+            return
+        }
+        let writeTypes = Set<HKSampleType>()
+        healthStore.getRequestStatusForAuthorization(toShare: writeTypes, read: defaultReadTypes) { status, _ in
+            // If request is unnecessary, we have already asked in the past (granted or denied).
+            // We optimistically assume granted and verify by attempting reads when needed.
+            completion(status == .unnecessary)
         }
     }
     

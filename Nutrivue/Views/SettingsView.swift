@@ -64,6 +64,26 @@ struct SettingsView: View {
                             savePreferences()
                         }
                     }
+                    
+                    Section(header: Text("Goals")) {
+                        if let goals = user?.goals {
+                            Picker("Goal", selection: Binding(get: {
+                                GoalService.GoalType(rawValue: goals.goalTypeRaw ?? "maintain") ?? .maintain
+                            }, set: { newValue in
+                                recalculateGoals(goal: newValue)
+                            })) {
+                                Text("Maintain").tag(GoalService.GoalType.maintain)
+                                Text("Lose Weight").tag(GoalService.GoalType.lose)
+                                Text("Gain Weight").tag(GoalService.GoalType.gain)
+                                Text("Build Muscle").tag(GoalService.GoalType.muscle)
+                            }
+                            .pickerStyle(.menu)
+                            HStack { Text("Calories"); Spacer(); Text(String(format: "%.0f kcal", goals.calories)) }
+                            HStack { Text("Protein"); Spacer(); Text(String(format: "%.0f g", goals.protein)) }
+                            HStack { Text("Carbs"); Spacer(); Text(String(format: "%.0f g", goals.carbohydrates)) }
+                            HStack { Text("Fat"); Spacer(); Text(String(format: "%.0f g", goals.fat)) }
+                        }
+                    }
                 }
                 
                 Section(header: Text("Notifications")) {
@@ -88,7 +108,10 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
-            .onAppear(perform: loadUserData)
+            .onAppear {
+                loadUserData()
+                viewModel.refreshHealthKitAuthorizationState()
+            }
             .alert("Preferences Saved", isPresented: $showingSaveConfirmation) {
                 Button("OK", role: .cancel) { }
             }
@@ -108,6 +131,13 @@ struct SettingsView: View {
             user.dietaryNotes = dietaryNotes
             showingSaveConfirmation = true
         }
+    }
+    
+    private func recalculateGoals(goal: GoalService.GoalType) {
+        guard let user = user else { return }
+        let service = GoalService()
+        let newGoals = service.calculateGoals(for: user, goal: goal)
+        user.goals = newGoals
     }
 }
 
