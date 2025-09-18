@@ -3,12 +3,16 @@ import SwiftData
 
 struct LogView: View {
     @Query(sort: \Meal.date) private var meals: [Meal]
+    @Query private var users: [User]
     
     @State private var showingScannerSheet = false
     // Use item-bound sheets to avoid race where content evaluates with nil meal on first presentation
     @State private var mealForSearch: Meal?
     @State private var mealForAdd: Meal?
     @State private var showingMealPicker = false
+    @State private var showingGlobalMealPicker = false
+    @State private var mealForGlobalAdd: Meal?
+    @State private var showingAddTypeDialog = false
     @State private var showingRecipePicker = false
     @State private var selectedRecipe: Recipe?
     @State private var mealForRecipe: Meal?
@@ -19,40 +23,24 @@ struct LogView: View {
     private var todaysMeals: [Meal] {
         meals.filter { Calendar.current.isDateInToday($0.date) }
     }
+    private var unitSystem: UnitSystem { users.first?.unitSystem ?? .metric }
     
     var body: some View {
         NavigationView {
-            List {
-                ForEach(todaysMeals) { meal in
-                    Section(header: Text(meal.name)) {
-                        ForEach(meal.items) { item in
-                            Text(item.name)
-                        }
-                        .onDelete { indexSet in
-                            deleteFoodItem(from: meal, at: indexSet)
-                        }
-                        
-                        Button(action: {
-                            mealForRecipe = meal
-                            showingRecipePicker = true
-                        }) {
-                            Label("Add Recipe", systemImage: "book")
-                        }
-                        Button(action: {
-                            mealForSearch = meal
-                        }) {
-                            Label("Add Food", systemImage: "plus")
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Log Food")
+            mealsList
+            .listStyle(.insetGrouped)
+            .navigationTitle("Log")
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showingGlobalMealPicker = true
+                    }) {
+                        Image(systemName: "plus")
+                    }
                     Button(action: {
                         showingScannerSheet = true
                     }) {
-                        Label("Scan Barcode", systemImage: "barcode.viewfinder")
+                        Image(systemName: "barcode.viewfinder")
                     }
                 }
             }
@@ -106,6 +94,31 @@ struct LogView: View {
                     resetScanState()
                 }
             }
+            .confirmationDialog("Choose Meal", isPresented: $showingGlobalMealPicker, titleVisibility: .visible) {
+                ForEach(todaysMeals) { meal in
+                    Button(meal.name) {
+                        mealForGlobalAdd = meal
+                        showingAddTypeDialog = true
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+            .confirmationDialog("Add to \(mealForGlobalAdd?.name ?? "Meal")", isPresented: $showingAddTypeDialog, titleVisibility: .visible) {
+                Button("Add Food") {
+                    if let meal = mealForGlobalAdd {
+                        mealForSearch = meal
+                    }
+                    mealForGlobalAdd = nil
+                }
+                Button("Add Recipe") {
+                    if let meal = mealForGlobalAdd {
+                        mealForRecipe = meal
+                        showingRecipePicker = true
+                    }
+                    mealForGlobalAdd = nil
+                }
+                Button("Cancel", role: .cancel) { mealForGlobalAdd = nil }
+            }
             .sheet(isPresented: $showingRecipePicker) {
                 RecipePickerView(onPick: { recipe in
                     selectedRecipe = recipe
@@ -149,6 +162,27 @@ struct LogView: View {
         }
     }
     
+    private var mealsList: some View {
+        List {
+            ForEach(todaysMeals) { meal in
+                MealSectionView(
+                    meal: meal,
+                    unitSystem: unitSystem,
+                    onAddRecipe: {
+                        mealForRecipe = meal
+                        showingRecipePicker = true
+                    },
+                    onAddFood: {
+                        mealForSearch = meal
+                    },
+                    onDeleteItems: { indexSet in
+                        deleteFoodItem(from: meal, at: indexSet)
+                    }
+                )
+            }
+        }
+    }
+    
     private func deleteFoodItem(from meal: Meal, at offsets: IndexSet) {
         meal.items.remove(atOffsets: offsets)
     }
@@ -158,6 +192,67 @@ struct LogView: View {
         foodLookupViewModel.productNotFound = false
     }
     
+}
+
+private struct FoodRow: View {
+    @Query private var users: [User]
+    private var unitSystem: UnitSystem { users.first?.unitSystem ?? .metric }
+    let item: FoodItem
+    var body: some View {
+        HStack {
+            Text(item.name)
+            Spacer()
+        }
+    }
+}
+
+private struct MacroPill: View {
+    let text: String
+    var body: some View {
+        Text(text)
+            .font(.caption2)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(Color(.tertiarySystemFill)))
+            .foregroundColor(.secondary)
+    }
+}
+
+private struct MealSectionView: View {
+    let meal: Meal
+    let unitSystem: UnitSystem
+    let onAddRecipe: () -> Void
+    let onAddFood: () -> Void
+    let onDeleteItems: (IndexSet) -> Void
+    
+    var body: some View {
+        Section {
+            ForEach(meal.items) { item in
+                FoodRow(item: item)
+            }
+            .onDelete(perform: onDeleteItems)
+        } header: {
+            Text(meal.name)
+        } footer: {
+            MealFooter(
+                meal: meal,
+                unitSystem: unitSystem,
+                onAddRecipe: onAddRecipe,
+                onAddFood: onAddFood
+            )
+        }
+    }
+}
+
+private struct MealFooter: View {
+    let meal: Meal
+    let unitSystem: UnitSystem
+    let onAddRecipe: () -> Void
+    let onAddFood: () -> Void
+    
+    var body: some View {
+        EmptyView()
+    }
 }
 
 // (Supplements removed from LogView)

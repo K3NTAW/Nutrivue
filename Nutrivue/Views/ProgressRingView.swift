@@ -3,6 +3,7 @@ import SwiftUI
 struct ProgressRingView: View {
     let progress: Double
     let color: Color
+    let overflow: Double? // 0..1 of overflow to display in red
     let lineWidth: CGFloat = 20.0
     
     var body: some View {
@@ -15,12 +16,19 @@ struct ProgressRingView: View {
                 .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
                 .rotationEffect(Angle(degrees: -90))
                 .animation(.linear, value: progress)
+            if let overflow, overflow > 0 {
+                Circle()
+                    .trim(from: 0.0, to: CGFloat(min(overflow, 1.0)))
+                    .stroke(Color.red, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
+                    .rotationEffect(Angle(degrees: -90))
+                    .animation(.linear, value: overflow)
+            }
         }
     }
 }
 
 #Preview {
-    ProgressRingView(progress: 0.65, color: .blue)
+    ProgressRingView(progress: 0.65, color: .blue, overflow: 0.2)
         .frame(width: 150, height: 150)
         .padding()
 }

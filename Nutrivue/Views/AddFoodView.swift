@@ -1,6 +1,9 @@
 import SwiftUI
+import SwiftData
 
 struct AddFoodView: View {
+    @Query private var users: [User]
+    private var unitSystem: UnitSystem { users.first?.unitSystem ?? .metric }
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
@@ -13,30 +16,30 @@ struct AddFoodView: View {
     @State private var protein = ""
     @State private var carbs = ""
     @State private var fat = ""
-    @State private var servingSizeGrams = "100"
+    @State private var servingSizeGrams = ""
     
     // Computed properties for calculated values
     private var calculatedCalories: Double {
         let baseCalories = product?.nutriments?.energyKcal100g ?? Double(calories) ?? 0
-        let serving = Double(servingSizeGrams) ?? 100
+        let serving = Double(servingSizeGrams) ?? 0
         return (baseCalories / 100) * serving
     }
     
     private var calculatedProtein: Double {
         let baseProtein = product?.nutriments?.proteins100g ?? Double(protein) ?? 0
-        let serving = Double(servingSizeGrams) ?? 100
+        let serving = Double(servingSizeGrams) ?? 0
         return (baseProtein / 100) * serving
     }
     
     private var calculatedCarbs: Double {
         let baseCarbs = product?.nutriments?.carbohydrates100g ?? Double(carbs) ?? 0
-        let serving = Double(servingSizeGrams) ?? 100
+        let serving = Double(servingSizeGrams) ?? 0
         return (baseCarbs / 100) * serving
     }
     
     private var calculatedFat: Double {
         let baseFat = product?.nutriments?.fat100g ?? Double(fat) ?? 0
-        let serving = Double(servingSizeGrams) ?? 100
+        let serving = Double(servingSizeGrams) ?? 0
         return (baseFat / 100) * serving
     }
     
@@ -47,14 +50,23 @@ struct AddFoodView: View {
                     // Search result flow
                     Section(header: Text("Confirm Nutrition")) {
                         Text(name)
-                        TextField("Serving Size (g)", text: $servingSizeGrams)
-                            .keyboardType(.decimalPad)
+                        HStack {
+                            TextField("Serving size", text: $servingSizeGrams)
+                                .keyboardType(.decimalPad)
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled(true)
+                                .accessibilityLabel("Serving size in grams")
+                            Spacer()
+                            Text("g").foregroundColor(.secondary)
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityHint("Tap to edit grams")
                     }
                     Section(header: Text("Calculated Nutrition")) {
                         Text("Calories: \(calculatedCalories, specifier: "%.0f") kcal")
-                        Text("Protein: \(calculatedProtein, specifier: "%.1f") g")
-                        Text("Carbohydrates: \(calculatedCarbs, specifier: "%.1f") g")
-                        Text("Fat: \(calculatedFat, specifier: "%.1f") g")
+                        Text("Protein: \(MassUnitFormatter.formatMacro(grams: calculatedProtein, unitSystem: unitSystem))")
+                        Text("Carbohydrates: \(MassUnitFormatter.formatMacro(grams: calculatedCarbs, unitSystem: unitSystem))")
+                        Text("Fat: \(MassUnitFormatter.formatMacro(grams: calculatedFat, unitSystem: unitSystem))")
                     }
                 } else {
                     // Manual entry flow

@@ -36,7 +36,7 @@ struct SettingsView: View {
                             HStack {
                                 Text("Latest Weight")
                                 Spacer()
-                                Text("\(weight, specifier: "%.1f") kg")
+                                Text(formatWeight(weight))
                             }
                         }
                         
@@ -79,9 +79,9 @@ struct SettingsView: View {
                             }
                             .pickerStyle(.menu)
                             HStack { Text("Calories"); Spacer(); Text(String(format: "%.0f kcal", goals.calories)) }
-                            HStack { Text("Protein"); Spacer(); Text(String(format: "%.0f g", goals.protein)) }
-                            HStack { Text("Carbs"); Spacer(); Text(String(format: "%.0f g", goals.carbohydrates)) }
-                            HStack { Text("Fat"); Spacer(); Text(String(format: "%.0f g", goals.fat)) }
+                            HStack { Text("Protein"); Spacer(); Text(MassUnitFormatter.formatMacro(grams: goals.protein, unitSystem: unitSystem)) }
+                            HStack { Text("Carbs"); Spacer(); Text(MassUnitFormatter.formatMacro(grams: goals.carbohydrates, unitSystem: unitSystem)) }
+                            HStack { Text("Fat"); Spacer(); Text(MassUnitFormatter.formatMacro(grams: goals.fat, unitSystem: unitSystem)) }
                         }
                     }
                 }
@@ -138,6 +138,16 @@ struct SettingsView: View {
         let service = GoalService()
         let newGoals = service.calculateGoals(for: user, goal: goal)
         user.goals = newGoals
+    }
+    
+    private func formatWeight(_ kilograms: Double) -> String {
+        switch unitSystem {
+        case .metric:
+            return String(format: "%.1f kg", kilograms)
+        case .imperial:
+            let pounds = kilograms * 2.2046226218
+            return String(format: "%.1f lb", pounds)
+        }
     }
 }
 

@@ -96,8 +96,7 @@ extension Supplement {
             }
             return days
         }
-        var days: [Int] = []
-        return days
+        return []
     }
     
     func timeComponents() -> DateComponents? {

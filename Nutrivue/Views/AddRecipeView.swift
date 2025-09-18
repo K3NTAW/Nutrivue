@@ -91,37 +91,28 @@ struct AddRecipeView: View {
                 }
             }
             .sheet(item: $scannedProduct) { product in
-                NavigationView {
-                    Form {
-                        Section(header: Text(product.productName ?? "Ingredient")) {
-                            TextField("Amount (g)", text: $scanGramsText).keyboardType(.numberPad)
-                        }
-                    }
-                    .navigationTitle("Amount")
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) { Button("Back") { scannedProduct = nil } }
-                        ToolbarItem(placement: .primaryAction) {
-                            Button("Add") {
-                                if let nutr = product.nutriments {
-                                    let grams = Double(scanGramsText) ?? 100
-                                    let ing = RecipeIngredient(
-                                        name: product.productName ?? "Ingredient",
-                                        amountGrams: grams,
-                                        caloriesPer100g: nutr.energyKcal100g ?? 0,
-                                        proteinPer100g: nutr.proteins100g ?? 0,
-                                        carbsPer100g: nutr.carbohydrates100g ?? 0,
-                                        fatPer100g: nutr.fat100g ?? 0,
-                                        sourceBarcode: product.code,
-                                        sourceImageUrl: product.imageUrl
-                                    )
-                                    ingredients.append(ing)
-                                }
-                                foodLookupVM.product = nil
-                                scannedProduct = nil
-                            }
-                        }
-                    }
-                }
+                AdjustServingSheet(productName: product.productName ?? "Ingredient",
+                                    caloriesPer100g: product.nutriments?.energyKcal100g ?? 0,
+                                    proteinPer100g: product.nutriments?.proteins100g ?? 0,
+                                    carbsPer100g: product.nutriments?.carbohydrates100g ?? 0,
+                                    fatPer100g: product.nutriments?.fat100g ?? 0,
+                                    onConfirm: { grams in
+                    let ing = RecipeIngredient(
+                        name: product.productName ?? "Ingredient",
+                        amountGrams: grams,
+                        caloriesPer100g: product.nutriments?.energyKcal100g ?? 0,
+                        proteinPer100g: product.nutriments?.proteins100g ?? 0,
+                        carbsPer100g: product.nutriments?.carbohydrates100g ?? 0,
+                        fatPer100g: product.nutriments?.fat100g ?? 0,
+                        sourceBarcode: product.code,
+                        sourceImageUrl: product.imageUrl
+                    )
+                    ingredients.append(ing)
+                    foodLookupVM.product = nil
+                    scannedProduct = nil
+                }, onCancel: {
+                    scannedProduct = nil
+                })
             }
             .onChange(of: foodLookupVM.product) {
                 if let p = foodLookupVM.product { scannedProduct = p }

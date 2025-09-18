@@ -54,7 +54,9 @@ struct DashboardView: View {
                         
                         // Calorie Progress Ring
                         ZStack {
-                            ProgressRingView(progress: totalCaloriesToday / goals.calories, color: .accentColor)
+                            let progress = totalCaloriesToday / goals.calories
+                            let overflow = max(0, progress - 1)
+                            ProgressRingView(progress: progress, color: .accentColor, overflow: overflow)
                                 .frame(width: 220, height: 220)
                             
                             VStack {
@@ -73,7 +75,7 @@ struct DashboardView: View {
                         // Macronutrient Progress Bars
                         GroupBox {
                             VStack(spacing: 15) {
-                                MacroProgressView(name: "Protein", current: totalProteinToday, goal: goals.protein, color: .red)
+                                MacroProgressView(name: "Protein", current: totalProteinToday, goal: goals.protein, color: .purple)
                                 MacroProgressView(name: "Carbs", current: totalCarbsToday, goal: goals.carbohydrates, color: .green)
                                 MacroProgressView(name: "Fat", current: totalFatToday, goal: goals.fat, color: .orange)
                             }
