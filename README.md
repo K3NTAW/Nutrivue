@@ -126,6 +126,22 @@ Nutrivue is designed to help users maintain a healthy relationship with food and
 - OpenFoodFacts API for product data (no auth required for basic usage).
 - Ensure camera permission for scanning and notification permission for reminders.
 
+### Add the Widget Extension Target
+
+1) In Xcode: File → New → Target… → iOS → Widget Extension → Next.
+2) Name it `NutrivueWidgets` and make sure “Include Configuration Intent” is unchecked (we use static timeline providers here). Finish.
+3) Add the following files to the new target (already present in repo under `NutrivueWidgets/`):
+   - `NutrivueWidgetsBundle.swift`
+   - `CaloriesProgressWidget.swift`
+   - `SupplementsReminderWidget.swift`
+   - `QuickAddWidget.swift`
+   - `DashboardOverviewWidget.swift`
+   - `MacroSummaryWidget.swift`
+   - `NutritionAlertWidget.swift`
+4) In the widget target’s Build Settings, set Swift Language to match the app and enable SwiftUI/WidgetKit.
+5) Add the app group/deeplinks as needed (e.g., `nutrivue://…`) so tapping widgets routes into the app.
+6) Build & Run the widget target, then add the widgets from the iOS Home Screen.
+
 ---
 
 Questions or suggestions? File an issue or start a discussion.

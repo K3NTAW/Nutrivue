@@ -132,6 +132,10 @@ struct LogView: View {
                         let n = recipe.scaledNutrition(servings: servings)
                         let item = FoodItem(name: recipe.name, calories: n.cal, protein: n.p, carbohydrates: n.c, fat: n.f)
                         targetMeal.items.append(item)
+                        // Write widget snapshot after logging a recipe
+                        if let container = try? ModelContainer(for: Meal.self, FoodItem.self) {
+                            WidgetSnapshotService(modelContext: container.mainContext).writeSnapshot()
+                        }
                     }
                     mealForRecipe = nil
                 }
@@ -160,6 +164,16 @@ struct LogView: View {
                 }
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .quickAddFood)) { _ in
+            showingGlobalMealPicker = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .quickAddRecipe)) { _ in
+            showingGlobalMealPicker = true
+            showingAddTypeDialog = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .quickScan)) { _ in
+            showingScannerSheet = true
+        }
     }
     
     private var mealsList: some View {
@@ -185,6 +199,10 @@ struct LogView: View {
     
     private func deleteFoodItem(from meal: Meal, at offsets: IndexSet) {
         meal.items.remove(atOffsets: offsets)
+        // Write snapshot using a temporary container (no direct modelContext in this view)
+        if let container = try? ModelContainer(for: Meal.self, FoodItem.self, User.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
+            WidgetSnapshotService(modelContext: container.mainContext).writeSnapshot()
+        }
     }
     
     private func resetScanState() {

@@ -18,6 +18,8 @@ struct NutrivueApp: App {
                     // Background health sync at app start
                     let sync = HealthSyncService(modelContext: modelContext)
                     sync.syncIfAuthorized()
+                    // Write initial widget snapshot
+                    WidgetSnapshotService(modelContext: modelContext).writeSnapshot()
                 }
         }
         .modelContainer(for: [User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self])

@@ -28,6 +28,9 @@ struct SupplementsView: View {
                 AddSupplementView()
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .quickAddSupplement)) { _ in
+            showingAddSupplement = true
+        }
     }
     
     private func delete(at offsets: IndexSet) {

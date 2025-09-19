@@ -161,6 +161,7 @@ struct AddRecipeView: View {
     private func save() {
         let recipe = Recipe(name: name.trimmingCharacters(in: .whitespacesAndNewlines), notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : notes, servings: servings, ingredients: ingredients)
         modelContext.insert(recipe)
+        WidgetSnapshotService(modelContext: modelContext).writeSnapshot()
         dismiss()
     }
     

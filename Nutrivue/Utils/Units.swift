@@ -12,4 +12,11 @@ enum MassUnitFormatter {
     }
 }
 
+extension Notification.Name {
+    static let quickAddFood = Notification.Name("quickAddFood")
+    static let quickAddRecipe = Notification.Name("quickAddRecipe")
+    static let quickScan = Notification.Name("quickScan")
+    static let quickAddSupplement = Notification.Name("quickAddSupplement")
+}
+
 

@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct SettingsView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query private var users: [User]
     private var user: User? { users.first }
     
@@ -136,6 +137,7 @@ struct SettingsView: View {
             user.unitSystem = unitSystem
             user.dietaryNotes = dietaryNotes
             showingSaveConfirmation = true
+            WidgetSnapshotService(modelContext: modelContext).writeSnapshot()
         }
     }
     
@@ -144,6 +146,7 @@ struct SettingsView: View {
         let service = GoalService()
         let newGoals = service.calculateGoals(for: user, goal: goal)
         user.goals = newGoals
+        WidgetSnapshotService(modelContext: modelContext).writeSnapshot()
     }
     
     private func formatWeight(_ kilograms: Double) -> String {

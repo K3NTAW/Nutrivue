@@ -110,6 +110,7 @@ struct AddFoodView: View {
         
         let newFood = FoodItem(name: name, calories: finalCalories, protein: finalProtein, carbohydrates: finalCarbs, fat: finalFat)
         meal.items.append(newFood)
+        WidgetSnapshotService(modelContext: modelContext).writeSnapshot()
         dismiss()
     }
 }
