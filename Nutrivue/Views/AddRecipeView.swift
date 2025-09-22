@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import WidgetKit
+import UIKit
 
 struct AddRecipeView: View {
     @Environment(\.dismiss) private var dismiss
@@ -17,6 +18,9 @@ struct AddRecipeView: View {
     @State private var scanGramsText: String = "100"
     @StateObject private var foodLookupVM = FoodLookupViewModel()
     @StateObject private var searchVM = SearchViewModel()
+    @State private var showingOCRSheet = false
+    @State private var ocrProcessing = false
+    @State private var ocrAlertMessage: String?
     
     var body: some View {
         NavigationView {
@@ -48,6 +52,11 @@ struct AddRecipeView: View {
                         showingScanner = true
                     } label: {
                         Label("Scan Barcode", systemImage: "barcode.viewfinder")
+                    }
+                    Button {
+                        showingOCRSheet = true
+                    } label: {
+                        Label("Scan Recipe (OCR)", systemImage: "doc.text.viewfinder")
                     }
                 }
                 Section(header: Text("Totals")) {
@@ -89,6 +98,60 @@ struct AddRecipeView: View {
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                     showingScanner = false
                     foodLookupVM.fetchProduct(barcode: barcode)
+                }
+            }
+            .sheet(isPresented: $showingOCRSheet) {
+                RecipeOCRSheet { text in
+                    ocrProcessing = true
+                    Task {
+                        if let apiKey = UserDefaults.standard.string(forKey: "OpenRouterAPIKey"), !apiKey.isEmpty {
+                            do {
+                                let model = UserDefaults.standard.string(forKey: "OpenRouterModel") ?? "openrouter/anthropic/claude-3.5-sonnet"
+                                let service = OpenRouterRecipeService()
+                                let ai = try await service.parseRecipe(ocrText: text, options: .init(apiKey: apiKey, model: model, referer: "https://nutrivue.app", title: "Nutrivue"))
+                                await MainActor.run {
+                                    if let n = ai.name, self.name.trimmingCharacters(in: .whitespaces).isEmpty { self.name = String(n.prefix(40)) }
+                                    if let s = ai.servings, s > 0 { self.servings = s }
+                                    var created: [RecipeIngredient] = []
+                                    for ing in ai.ingredients {
+                                        let grams = ing.grams ?? OpenRouterRecipeService.convertToGrams(quantity: ing.quantity, unit: ing.unit) ?? 0
+                                        let ri = RecipeIngredient(name: ing.name, amountGrams: grams, caloriesPer100g: 0, proteinPer100g: 0, carbsPer100g: 0, fatPer100g: 0)
+                                        created.append(ri)
+                                    }
+                                    self.ingredients.append(contentsOf: created)
+                                    ocrProcessing = false
+                                }
+                            } catch {
+                                await MainActor.run { ocrAlertMessage = "AI parsing failed. Falling back to local parser." }
+                                let importer = RecipeImportService()
+                                let (autoIngredients, autoServings) = await importer.importFromOCR(text: text)
+                                await MainActor.run {
+                                    self.ingredients.append(contentsOf: autoIngredients)
+                                    if autoServings > 0 { self.servings = autoServings }
+                                    ocrProcessing = false
+                                }
+                            }
+                        } else {
+                            let importer = RecipeImportService()
+                            let (autoIngredients, autoServings) = await importer.importFromOCR(text: text)
+                            await MainActor.run {
+                                if autoIngredients.isEmpty {
+                                    ocrAlertMessage = "No ingredients detected. Try a clearer photo focused on the Ingredients list."
+                                } else {
+                                    self.ingredients.append(contentsOf: autoIngredients)
+                                    if autoServings > 0 { self.servings = autoServings }
+                                    if self.name.trimmingCharacters(in: .whitespaces).isEmpty {
+                                        if let first = text.split(separator: "\n").first(where: { !$0.trimmingCharacters(in: .whitespaces).isEmpty }) {
+                                            self.name = String(first.prefix(40))
+                                        } else {
+                                            self.name = "Imported Recipe"
+                                        }
+                                    }
+                                }
+                                ocrProcessing = false
+                            }
+                        }
+                    }
                 }
             }
             .sheet(item: $scannedProduct) { product in
@@ -139,6 +202,22 @@ struct AddRecipeView: View {
                         }
                     }
                 }
+                if ocrProcessing {
+                    ZStack {
+                        Color.black.opacity(0.25).ignoresSafeArea()
+                        VStack(spacing: 10) {
+                            ProgressView()
+                            Text("Importing recipe...").foregroundColor(.secondary)
+                        }
+                        .padding(16)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemBackground)))
+                    }
+                }
+            }
+            .alert("Import Failed", isPresented: Binding(get: { ocrAlertMessage != nil }, set: { if !$0 { ocrAlertMessage = nil } })) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(ocrAlertMessage ?? "")
             }
         }
     }
@@ -171,6 +250,74 @@ struct AddRecipeView: View {
     private func resetScanState() {
         foodLookupVM.product = nil
         foodLookupVM.productNotFound = false
+    }
+}
+
+// Minimal OCR picker to choose Camera or Photo Library, then run OCR
+private struct RecipeOCRSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    var onTextExtracted: (String) -> Void
+    @State private var showCamera = false
+    @State private var showLibrary = false
+    @State private var pickedImages: [UIImage] = []
+
+    var body: some View {
+        NavigationView {
+            List {
+                Button { showCamera = true } label: { Label("Scan with Camera", systemImage: "camera.viewfinder") }
+                Button { showLibrary = true } label: { Label("Import Photo", systemImage: "photo.on.rectangle") }
+            }
+            .navigationTitle("Import Recipe")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
+            }
+            .sheet(isPresented: $showLibrary) {
+                ImagePicker(images: $pickedImages)
+            }
+            .fullScreenCover(isPresented: $showCamera) {
+                CameraCaptureView(onCapture: { image in
+                    if let image = image {
+                        TextRecognitionService().recognizeText(from: [image]) { text in
+                            onTextExtracted(text)
+                            dismiss()
+                        }
+                    } else {
+                        dismiss()
+                    }
+                }, onCancel: { dismiss() })
+            }
+            .onChange(of: pickedImages) {
+                guard !pickedImages.isEmpty else { return }
+                let imgs = pickedImages
+                pickedImages = []
+                TextRecognitionService().recognizeText(from: imgs) { text in
+                    onTextExtracted(text)
+                    dismiss()
+                }
+            }
+        }
+    }
+}
+
+// Simple UIKit-backed picker for one or more photos
+private struct ImagePicker: UIViewControllerRepresentable {
+    @Binding var images: [UIImage]
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let vc = UIImagePickerController()
+        vc.sourceType = .photoLibrary
+        vc.delegate = context.coordinator
+        return vc
+    }
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    func makeCoordinator() -> Coord { Coord(parent: self) }
+    class Coord: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let parent: ImagePicker
+        init(parent: ImagePicker) { self.parent = parent }
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let img = info[.originalImage] as? UIImage { parent.images = [img] }
+            picker.dismiss(animated: true)
+        }
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) { picker.dismiss(animated: true) }
     }
 }
 
@@ -286,6 +433,36 @@ private struct IngredientSearchView: View {
                     pickedProduct = nil
                 })
             }
+        }
+    }
+}
+
+private struct CameraCaptureView: UIViewControllerRepresentable {
+    var onCapture: (UIImage?) -> Void
+    var onCancel: () -> Void
+    
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let vc = UIImagePickerController()
+        vc.sourceType = .camera
+        vc.delegate = context.coordinator
+        return vc
+    }
+    
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    
+    func makeCoordinator() -> Coord { Coord(parent: self) }
+    
+    class Coord: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let parent: CameraCaptureView
+        init(parent: CameraCaptureView) { self.parent = parent }
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            let img = info[.originalImage] as? UIImage
+            parent.onCapture(img)
+            picker.dismiss(animated: true)
+        }
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.onCancel()
+            picker.dismiss(animated: true)
         }
     }
 }

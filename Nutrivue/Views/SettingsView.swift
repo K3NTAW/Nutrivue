@@ -71,6 +71,19 @@ struct SettingsView: View {
                         }
                     }
                     
+                    Section(header: Text("AI Recipe Import")) {
+                        TextField("OpenRouter API Key", text: Binding(get: {
+                            UserDefaults.standard.string(forKey: "OpenRouterAPIKey") ?? ""
+                        }, set: { newVal in
+                            UserDefaults.standard.set(newVal, forKey: "OpenRouterAPIKey")
+                        }))
+                        TextField("Model (e.g., openrouter/anthropic/claude-3.5-sonnet)", text: Binding(get: {
+                            UserDefaults.standard.string(forKey: "OpenRouterModel") ?? "openrouter/anthropic/claude-3.5-sonnet"
+                        }, set: { newVal in
+                            UserDefaults.standard.set(newVal, forKey: "OpenRouterModel")
+                        }))
+                    }
+                    
                     Section(header: Text("Goals")) {
                         if let goals = user?.goals {
                             Picker("Goal", selection: Binding(get: {
