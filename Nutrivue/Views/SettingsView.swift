@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -114,8 +115,8 @@ struct SettingsView: View {
                     viewModel.fetchHealthData()
                 }
             }
-            .onChange(of: viewModel.isHealthKitAuthorized) { newValue in
-                if newValue {
+            .onChange(of: viewModel.isHealthKitAuthorized) {
+                if viewModel.isHealthKitAuthorized {
                     viewModel.fetchHealthData()
                 }
             }
@@ -137,7 +138,9 @@ struct SettingsView: View {
             user.unitSystem = unitSystem
             user.dietaryNotes = dietaryNotes
             showingSaveConfirmation = true
-            WidgetSnapshotService(modelContext: modelContext).writeSnapshot()
+            if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
+                WidgetSnapshotService(modelContainer: container).writeSnapshot()
+            }
         }
     }
     
@@ -146,7 +149,9 @@ struct SettingsView: View {
         let service = GoalService()
         let newGoals = service.calculateGoals(for: user, goal: goal)
         user.goals = newGoals
-        WidgetSnapshotService(modelContext: modelContext).writeSnapshot()
+        if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
+            WidgetSnapshotService(modelContainer: container).writeSnapshot()
+        }
     }
     
     private func formatWeight(_ kilograms: Double) -> String {

@@ -86,6 +86,16 @@ class SearchViewModel: ObservableObject {
         favorites.contains(where: { $0.hasSameBarcode(as: product) })
     }
     
+    func clearFavorites() {
+        favorites = []
+        persistLists()
+    }
+    
+    func clearRecents() {
+        recentSearches = []
+        persistLists()
+    }
+    
     // MARK: - Deduplication
     func deduplicateByBarcode(products: [ProductData]) -> [ProductData] {
         var bestByCode: [String: ProductData] = [:]

@@ -72,7 +72,6 @@ struct DashboardOverviewWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "DashboardOverviewWidget", provider: OverviewProvider()) { entry in
             DashboardOverviewLargeView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Dashboard Overview")
         .description("Calories, supplements, and weekly trend at a glance.")

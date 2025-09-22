@@ -40,7 +40,6 @@ struct SupplementsProvider: TimelineProvider {
         completion(timeline)
     }
     private func mock() -> SupplementsEntry {
-        let cal = Calendar.current
         let base = Date()
         return SupplementsEntry(date: base, snapshot: nil) // Mock with nil snapshot
     }

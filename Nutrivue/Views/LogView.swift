@@ -133,8 +133,8 @@ struct LogView: View {
                         let item = FoodItem(name: recipe.name, calories: n.cal, protein: n.p, carbohydrates: n.c, fat: n.f)
                         targetMeal.items.append(item)
                         // Write widget snapshot after logging a recipe
-                        if let container = try? ModelContainer(for: Meal.self, FoodItem.self) {
-                            WidgetSnapshotService(modelContext: container.mainContext).writeSnapshot()
+                        if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
+                            WidgetSnapshotService(modelContainer: container).writeSnapshot()
                         }
                     }
                     mealForRecipe = nil
@@ -200,8 +200,8 @@ struct LogView: View {
     private func deleteFoodItem(from meal: Meal, at offsets: IndexSet) {
         meal.items.remove(atOffsets: offsets)
         // Write snapshot using a temporary container (no direct modelContext in this view)
-        if let container = try? ModelContainer(for: Meal.self, FoodItem.self, User.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
-            WidgetSnapshotService(modelContext: container.mainContext).writeSnapshot()
+        if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
+            WidgetSnapshotService(modelContainer: container).writeSnapshot()
         }
     }
     

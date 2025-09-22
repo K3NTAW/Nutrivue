@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 struct AddRecipeView: View {
     @Environment(\.dismiss) private var dismiss
@@ -161,7 +162,9 @@ struct AddRecipeView: View {
     private func save() {
         let recipe = Recipe(name: name.trimmingCharacters(in: .whitespacesAndNewlines), notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : notes, servings: servings, ingredients: ingredients)
         modelContext.insert(recipe)
-        WidgetSnapshotService(modelContext: modelContext).writeSnapshot()
+        if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
+            WidgetSnapshotService(modelContainer: container).writeSnapshot()
+        }
         dismiss()
     }
     
@@ -203,47 +206,85 @@ private struct IngredientSearchView: View {
     var body: some View {
         NavigationView {
             VStack {
-                List(searchVM.searchResults) { product in
-                    Button {
-                        pickedProduct = product
-                    } label: {
-                        HStack {
-                            if let u = URL(string: product.imageUrl ?? "") {
-                                AsyncImage(url: u) { img in img.resizable().scaledToFill() } placeholder: { Color.gray.opacity(0.2) }
-                                    .frame(width: 44, height: 44).clipped().cornerRadius(6)
+                List {
+                    if !searchVM.favorites.isEmpty {
+                        Section("Favorites") {
+                            ForEach(searchVM.favorites) { product in
+                                Button(action: {
+                                    pickedProduct = product
+                                    searchVM.recordSelection(product)
+                                }) {
+                                    SearchRow(product: product, query: searchVM.searchQuery, isFavorite: true) {
+                                        searchVM.toggleFavorite(product)
+                                    }
+                                }
+                                .buttonStyle(.plain)
                             }
-                            Text(product.productName ?? "Item")
-                            Spacer()
                         }
                     }
-                    .buttonStyle(.plain)
+                    if !searchVM.recentSearches.isEmpty {
+                        Section(header: HStack {
+                            Text("Recent Searches")
+                            Spacer()
+                            Button("Clear") {
+                                searchVM.clearRecents()
+                            }
+                        }) {
+                            ForEach(searchVM.recentSearches) { product in
+                                Button(action: {
+                                    pickedProduct = product
+                                    searchVM.recordSelection(product)
+                                }) {
+                                    SearchRow(product: product, query: searchVM.searchQuery, isFavorite: searchVM.isFavorite(product)) {
+                                        searchVM.toggleFavorite(product)
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                    ForEach(searchVM.searchResults) { product in
+                        Button {
+                            pickedProduct = product
+                        } label: {
+                            HStack {
+                                if let u = URL(string: product.imageUrl ?? "") {
+                                    AsyncImage(url: u) { img in img.resizable().scaledToFill() } placeholder: { Color.gray.opacity(0.2) }
+                                        .frame(width: 44, height: 44).clipped().cornerRadius(6)
+                                }
+                                Text(product.productName ?? "Item")
+                                Spacer()
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
                 .searchable(text: $searchVM.searchQuery)
                 .onAppear { searchVM.activate() }
+                .overlay {
+                    if searchVM.searchQuery.isEmpty && searchVM.searchResults.isEmpty {
+                        ContentUnavailableView("Search for Ingredients", systemImage: "magnifyingglass")
+                    } else if !searchVM.searchQuery.isEmpty && searchVM.searchResults.isEmpty {
+                        ContentUnavailableView.search(text: searchVM.searchQuery)
+                    }
+                }
             }
             .navigationTitle("Add Ingredient")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             }
             .sheet(item: $pickedProduct) { p in
-                NavigationView {
-                    Form {
-                        Section(header: Text(p.productName ?? "Ingredient")) {
-                            TextField("Amount (g)", text: $gramsText).keyboardType(.numberPad)
-                        }
-                    }
-                    .navigationTitle("Amount")
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) { Button("Back") { pickedProduct = nil } }
-                        ToolbarItem(placement: .primaryAction) {
-                            Button("Add") {
-                                let grams = Double(gramsText) ?? 100
-                                onPick(p, grams)
-                                dismiss()
-                            }
-                        }
-                    }
-                }
+                AdjustServingSheet(productName: p.productName ?? "Ingredient",
+                                   caloriesPer100g: p.nutriments?.energyKcal100g ?? 0,
+                                   proteinPer100g: p.nutriments?.proteins100g ?? 0,
+                                   carbsPer100g: p.nutriments?.carbohydrates100g ?? 0,
+                                   fatPer100g: p.nutriments?.fat100g ?? 0,
+                                   onConfirm: { grams in
+                    onPick(p, grams)
+                    dismiss()
+                }, onCancel: {
+                    pickedProduct = nil
+                })
             }
         }
     }

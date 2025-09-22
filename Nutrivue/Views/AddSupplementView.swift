@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 struct AddSupplementView: View {
     @Environment(\.dismiss) private var dismiss
@@ -91,6 +92,9 @@ struct AddSupplementView: View {
         )
         modelContext.insert(supplement)
         NotificationService().scheduleSupplementReminder(for: supplement)
+        if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
+            WidgetSnapshotService(modelContainer: container).writeSnapshot()
+        }
         dismiss()
     }
 }

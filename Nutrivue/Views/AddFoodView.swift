@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 struct AddFoodView: View {
     @Query private var users: [User]
@@ -110,7 +111,9 @@ struct AddFoodView: View {
         
         let newFood = FoodItem(name: name, calories: finalCalories, protein: finalProtein, carbohydrates: finalCarbs, fat: finalFat)
         meal.items.append(newFood)
-        WidgetSnapshotService(modelContext: modelContext).writeSnapshot()
+        if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
+            WidgetSnapshotService(modelContainer: container).writeSnapshot()
+        }
         dismiss()
     }
 }

@@ -5,11 +5,20 @@ struct RecipesView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Recipe.createdAt) private var recipes: [Recipe]
     @State private var showingAdd = false
+    @State private var searchQuery = ""
+    
+    private var filteredRecipes: [Recipe] {
+        if searchQuery.isEmpty {
+            return recipes
+        } else {
+            return recipes.filter { $0.name.localizedCaseInsensitiveContains(searchQuery) }
+        }
+    }
     
     var body: some View {
         NavigationView {
             List {
-                ForEach(recipes) { recipe in
+                ForEach(filteredRecipes) { recipe in
                     NavigationLink(destination: EditRecipeView(recipe: recipe)) {
                         HStack {
                             VStack(alignment: .leading) {
@@ -29,12 +38,20 @@ struct RecipesView: View {
                 }
             }
             .navigationTitle("Recipes")
+            .searchable(text: $searchQuery)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button { showingAdd = true } label: { Image(systemName: "plus") }
                 }
             }
             .sheet(isPresented: $showingAdd) { AddRecipeView() }
+            .overlay {
+                if recipes.isEmpty {
+                    ContentUnavailableView("No Recipes", systemImage: "fork.knife", description: Text("Tap the + button to create your first recipe."))
+                } else if filteredRecipes.isEmpty && !searchQuery.isEmpty {
+                    ContentUnavailableView.search(text: searchQuery)
+                }
+            }
         }
     }
 }
