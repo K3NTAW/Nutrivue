@@ -91,6 +91,7 @@ struct AddFoodView: View {
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button("Save") { saveFood() }
+                        .disabled((product != nil) && ((Double(servingSizeGrams) ?? 0) <= 0))
                 }
             }
             .onAppear(perform: prefillForm)
@@ -109,7 +110,8 @@ struct AddFoodView: View {
         let finalCarbs = calculatedCarbs
         let finalFat = calculatedFat
         
-        let newFood = FoodItem(name: name, calories: finalCalories, protein: finalProtein, carbohydrates: finalCarbs, fat: finalFat)
+        let gramsUsed = Double(servingSizeGrams) ?? 0
+        let newFood = FoodItem(name: name, calories: finalCalories, protein: finalProtein, carbohydrates: finalCarbs, fat: finalFat, servingGrams: gramsUsed > 0 ? gramsUsed : nil)
         meal.items.append(newFood)
         if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
             WidgetSnapshotService(modelContainer: container).writeSnapshot()

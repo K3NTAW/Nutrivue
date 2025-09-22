@@ -4,6 +4,7 @@ import SwiftData
 struct LogView: View {
     @Query(sort: \Meal.date) private var meals: [Meal]
     @Query private var users: [User]
+    @Query private var recipes: [Recipe]
     
     @State private var showingScannerSheet = false
     // Use item-bound sheets to avoid race where content evaluates with nil meal on first presentation
@@ -16,6 +17,8 @@ struct LogView: View {
     @State private var showingRecipePicker = false
     @State private var selectedRecipe: Recipe?
     @State private var mealForRecipe: Meal?
+    @State private var adjustingItemContext: AdjustItemContext?
+    @State private var adjustingRecipeContext: AdjustRecipeContext?
     
     @StateObject private var foodLookupViewModel = FoodLookupViewModel()
     @StateObject private var foodSearchViewModel = SearchViewModel()
@@ -130,7 +133,20 @@ struct LogView: View {
                 AdjustRecipeServingsView(recipe: recipe, defaultServings: recipe.servings) { servings in
                     if let targetMeal = mealForRecipe {
                         let n = recipe.scaledNutrition(servings: servings)
-                        let item = FoodItem(name: recipe.name, calories: n.cal, protein: n.p, carbohydrates: n.c, fat: n.f)
+                        // Compute grams used based on total ingredient grams and servings
+                        let totalGrams = recipe.ingredients.reduce(0.0) { $0 + $1.amountGrams }
+                        let gramsPerServing = totalGrams / max(recipe.servings, 1)
+                        let gramsUsed = gramsPerServing * servings
+                        let item = FoodItem(
+                            name: recipe.name,
+                            calories: n.cal,
+                            protein: n.p,
+                            carbohydrates: n.c,
+                            fat: n.f,
+                            servingGrams: gramsUsed,
+                            sourceRecipeId: recipe.id,
+                            recipeServingsUsed: servings
+                        )
                         targetMeal.items.append(item)
                         // Write widget snapshot after logging a recipe
                         if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
@@ -164,6 +180,53 @@ struct LogView: View {
                 }
             }
         }
+        // Sheets for adjusting items/recipes, attached to the main view instead of nested in overlay
+        .sheet(item: $adjustingItemContext, content: { ctx in
+            AdjustServingSheet(
+                productName: ctx.item.name,
+                caloriesPer100g: ctx.item.calories > 0 && (ctx.item.servingGrams ?? 0) > 0 ? (ctx.item.calories / (ctx.item.servingGrams ?? 100)) * 100 : 0,
+                proteinPer100g: ctx.item.protein > 0 && (ctx.item.servingGrams ?? 0) > 0 ? (ctx.item.protein / (ctx.item.servingGrams ?? 100)) * 100 : 0,
+                carbsPer100g: ctx.item.carbohydrates > 0 && (ctx.item.servingGrams ?? 0) > 0 ? (ctx.item.carbohydrates / (ctx.item.servingGrams ?? 100)) * 100 : 0,
+                fatPer100g: ctx.item.fat > 0 && (ctx.item.servingGrams ?? 0) > 0 ? (ctx.item.fat / (ctx.item.servingGrams ?? 100)) * 100 : 0,
+                initialGrams: ctx.item.servingGrams,
+                onConfirm: { newGrams in
+                    let per100Cal = ctx.item.calories > 0 && (ctx.item.servingGrams ?? 0) > 0 ? (ctx.item.calories / (ctx.item.servingGrams ?? 100)) * 100 : 0
+                    let per100P = ctx.item.protein > 0 && (ctx.item.servingGrams ?? 0) > 0 ? (ctx.item.protein / (ctx.item.servingGrams ?? 100)) * 100 : 0
+                    let per100C = ctx.item.carbohydrates > 0 && (ctx.item.servingGrams ?? 0) > 0 ? (ctx.item.carbohydrates / (ctx.item.servingGrams ?? 100)) * 100 : 0
+                    let per100F = ctx.item.fat > 0 && (ctx.item.servingGrams ?? 0) > 0 ? (ctx.item.fat / (ctx.item.servingGrams ?? 100)) * 100 : 0
+                    ctx.item.calories = (per100Cal / 100) * newGrams
+                    ctx.item.protein = (per100P / 100) * newGrams
+                    ctx.item.carbohydrates = (per100C / 100) * newGrams
+                    ctx.item.fat = (per100F / 100) * newGrams
+                    ctx.item.servingGrams = newGrams
+                    if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
+                        WidgetSnapshotService(modelContainer: container).writeSnapshot()
+                    }
+                    adjustingItemContext = nil
+                },
+                onCancel: {
+                    adjustingItemContext = nil
+                }
+            )
+        })
+        .sheet(item: $adjustingRecipeContext, content: { ctx in
+            AdjustRecipeServingsView(recipe: ctx.recipe, defaultServings: ctx.item.recipeServingsUsed ?? ctx.recipe.servings) { newServings in
+                let n = ctx.recipe.scaledNutrition(servings: newServings)
+                let totalGrams = ctx.recipe.ingredients.reduce(0.0) { $0 + $1.amountGrams }
+                let gramsPerServing = totalGrams / max(ctx.recipe.servings, 1)
+                let gramsUsed = gramsPerServing * newServings
+                ctx.item.calories = n.cal
+                ctx.item.protein = n.p
+                ctx.item.carbohydrates = n.c
+                ctx.item.fat = n.f
+                ctx.item.servingGrams = gramsUsed
+                ctx.item.recipeServingsUsed = newServings
+                if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
+                    WidgetSnapshotService(modelContainer: container).writeSnapshot()
+                }
+                adjustingRecipeContext = nil
+            }
+        })
         .onReceive(NotificationCenter.default.publisher(for: .quickAddFood)) { _ in
             showingGlobalMealPicker = true
         }
@@ -191,7 +254,8 @@ struct LogView: View {
                     },
                     onDeleteItems: { indexSet in
                         deleteFoodItem(from: meal, at: indexSet)
-                    }
+                    },
+                    onTapItem: { item in presentAdjustServing(for: item, in: meal) }
                 )
             }
         }
@@ -210,6 +274,27 @@ struct LogView: View {
         foodLookupViewModel.productNotFound = false
     }
     
+    private func presentAdjustServing(for item: FoodItem, in meal: Meal) {
+        if let rid = item.sourceRecipeId, let recipe = recipes.first(where: { $0.id == rid }) {
+            adjustingRecipeContext = AdjustRecipeContext(meal: meal, item: item, recipe: recipe)
+        } else {
+            adjustingItemContext = AdjustItemContext(meal: meal, item: item)
+        }
+    }
+    
+}
+
+private struct AdjustItemContext: Identifiable {
+    let id = UUID()
+    let meal: Meal
+    let item: FoodItem
+}
+
+private struct AdjustRecipeContext: Identifiable {
+    let id = UUID()
+    let meal: Meal
+    let item: FoodItem
+    let recipe: Recipe
 }
 
 private struct FoodRow: View {
@@ -220,6 +305,8 @@ private struct FoodRow: View {
         HStack {
             Text(item.name)
             Spacer()
+            Text(String(format: "%.0f kcal", item.calories))
+                .foregroundColor(.secondary)
         }
     }
 }
@@ -242,11 +329,13 @@ private struct MealSectionView: View {
     let onAddRecipe: () -> Void
     let onAddFood: () -> Void
     let onDeleteItems: (IndexSet) -> Void
+    let onTapItem: (FoodItem) -> Void
     
     var body: some View {
         Section {
             ForEach(meal.items) { item in
-                FoodRow(item: item)
+                Button { onTapItem(item) } label: { FoodRow(item: item) }
+                .buttonStyle(.plain)
             }
             .onDelete(perform: onDeleteItems)
         } header: {

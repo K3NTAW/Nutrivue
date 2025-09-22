@@ -6,6 +6,7 @@ struct AdjustServingSheet: View {
     let proteinPer100g: Double
     let carbsPer100g: Double
     let fatPer100g: Double
+    var initialGrams: Double? = nil
     var onConfirm: (Double) -> Void
     var onCancel: () -> Void
     
@@ -49,6 +50,11 @@ struct AdjustServingSheet: View {
                 ToolbarItem(placement: .primaryAction) {
                     Button("Add") { onConfirm(grams) }
                         .disabled(grams <= 0)
+                }
+            }
+            .onAppear {
+                if let g = initialGrams, gramsText.isEmpty {
+                    gramsText = String(format: g.truncatingRemainder(dividingBy: 1) == 0 ? "%.0f" : "%.1f", g)
                 }
             }
         }

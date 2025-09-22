@@ -19,12 +19,17 @@ struct SupplementsView: View {
         NavigationView {
             List {
                 ForEach(filteredSupplements) { supp in
-                    Button(action: {
-                        toggleTakenToday(for: supp)
-                    }) {
+                    NavigationLink(destination: EditSupplementView(supplement: supp)) {
                         SupplementRowView(supplement: supp)
                     }
-                    .buttonStyle(.plain)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button {
+                            toggleTakenToday(for: supp)
+                        } label: {
+                            Label(supp.wasTakenToday() ? "Unmark" : "Mark Taken", systemImage: supp.wasTakenToday() ? "arrow.uturn.backward.circle" : "checkmark.circle")
+                        }
+                        .tint(.accentColor)
+                    }
                 }
                 .onDelete(perform: delete)
             }
@@ -77,6 +82,118 @@ struct SupplementsView: View {
     }
 }
 
+private struct EditSupplementView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @State private var name: String
+    @State private var dosage: String
+    @State private var notes: String
+    @State private var scheduleType: SupplementScheduleType
+    @State private var selectedWeekdays: Set<Int>
+    @State private var weeklyWeekday: Int
+    @State private var time: Date
+    let supplement: Supplement
+    
+    init(supplement: Supplement) {
+        self.supplement = supplement
+        _name = State(initialValue: supplement.name)
+        _dosage = State(initialValue: supplement.dosage ?? "")
+        _notes = State(initialValue: supplement.notes ?? "")
+        _scheduleType = State(initialValue: supplement.scheduleType)
+        _weeklyWeekday = State(initialValue: supplement.weeklyWeekday ?? 2)
+        let days = Set(supplement.specificDaysList())
+        _selectedWeekdays = State(initialValue: days)
+        let comps = supplement.timeComponents() ?? DateComponents(hour: 8, minute: 0)
+        _time = State(initialValue: Calendar.current.date(from: comps) ?? Date())
+    }
+    
+    var body: some View {
+        Form {
+            Section("Details") {
+                TextField("Name", text: $name)
+                TextField("Dosage (optional)", text: $dosage)
+                TextField("Notes (optional)", text: $notes)
+            }
+            Section("Schedule") {
+                Picker("Frequency", selection: $scheduleType) {
+                    Text("Daily").tag(SupplementScheduleType.daily)
+                    Text("Weekly").tag(SupplementScheduleType.weekly)
+                    Text("Specific Days").tag(SupplementScheduleType.specificDays)
+                }
+                .pickerStyle(.segmented)
+                switch scheduleType {
+                case .daily:
+                    EmptyView()
+                case .weekly:
+                    Picker("Weekday", selection: $weeklyWeekday) {
+                        ForEach(1...7, id: \.self) { idx in
+                            Text(Calendar.current.weekdaySymbols[idx - 1]).tag(idx)
+                        }
+                    }
+                case .specificDays:
+                    WeekdayPicker(selected: $selectedWeekdays)
+                }
+                DatePicker("Time of Day (optional)", selection: $time, displayedComponents: .hourAndMinute)
+            }
+        }
+        .navigationTitle("Edit Supplement")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+            ToolbarItem(placement: .primaryAction) {
+                Button("Save") { save() }
+            }
+        }
+    }
+    
+    private func save() {
+        supplement.name = name
+        supplement.dosage = dosage.isEmpty ? nil : dosage
+        supplement.notes = notes.isEmpty ? nil : notes
+        supplement.scheduleTypeRaw = scheduleType.rawValue
+        switch scheduleType {
+        case .daily:
+            supplement.weeklyWeekday = nil
+            supplement.specificDaysMask = nil
+        case .weekly:
+            supplement.weeklyWeekday = weeklyWeekday
+            supplement.specificDaysMask = nil
+        case .specificDays:
+            let mask = selectedWeekdays.sorted().reduce(0) { $0 | (1 << ($1 - 1)) }
+            supplement.specificDaysMask = mask
+            supplement.weeklyWeekday = nil
+        }
+        let comps = Calendar.current.dateComponents([.hour, .minute], from: time)
+        supplement.timeHour = comps.hour
+        supplement.timeMinute = comps.minute
+        if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
+            WidgetSnapshotService(modelContainer: container).writeSnapshot()
+        }
+        dismiss()
+    }
+}
+
+// Local weekday multi-select to avoid cross-file dependency
+private struct WeekdayPicker: View {
+    @Binding var selected: Set<Int>
+    private let symbols = Calendar.current.weekdaySymbols // Sunday..Saturday
+    var body: some View {
+        VStack(alignment: .leading) {
+            ForEach(1...7, id: \.self) { idx in
+                let isOn = selected.contains(idx)
+                Button(action: {
+                    if isOn { selected.remove(idx) } else { selected.insert(idx) }
+                }) {
+                    HStack {
+                        Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
+                        Text(symbols[idx - 1])
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+}
+
 private struct SupplementRowView: View {
     let supplement: Supplement
     
@@ -119,5 +236,6 @@ private struct SupplementRowView: View {
         return syms[weekday - 1]
     }
 }
+
 
 
