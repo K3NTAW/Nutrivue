@@ -17,20 +17,26 @@ struct SettingsView: View {
         NavigationView {
             Form {
                 Section(header: Text("Integrations")) {
-                    if viewModel.isHealthKitAuthorized {
+                    if viewModel.isHealthKitAuthorized && viewModel.healthIntegrationEnabled {
                         Text("Apple Health Connected")
                             .foregroundColor(.green)
                         Text("Syncs automatically")
                             .font(.caption)
                             .foregroundColor(.secondary)
+                        Button("Disconnect Apple Health") {
+                            viewModel.disableHealthIntegration()
+                        }
                     } else {
+                        Text("Apple Health Disconnected")
+                            .foregroundColor(.red)
                         Button("Connect to Apple Health") {
+                            viewModel.enableHealthIntegration()
                             viewModel.authorizeHealthKit()
                         }
                     }
                 }
                 
-                if viewModel.isHealthKitAuthorized {
+                if viewModel.isHealthKitAuthorized && viewModel.healthIntegrationEnabled {
                     Section(header: Text("Health Data")) {
                         if let weight = viewModel.userWeight {
                             HStack {
@@ -70,18 +76,46 @@ struct SettingsView: View {
                             Picker("Goal", selection: Binding(get: {
                                 GoalService.GoalType(rawValue: goals.goalTypeRaw ?? "maintain") ?? .maintain
                             }, set: { newValue in
-                                recalculateGoals(goal: newValue)
+                                if newValue == .custom {
+                                    goals.goalTypeRaw = "custom"
+                                } else {
+                                    recalculateGoals(goal: newValue)
+                                }
                             })) {
                                 Text("Maintain").tag(GoalService.GoalType.maintain)
                                 Text("Lose Weight").tag(GoalService.GoalType.lose)
                                 Text("Gain Weight").tag(GoalService.GoalType.gain)
                                 Text("Build Muscle").tag(GoalService.GoalType.muscle)
+                                Text("Custom").tag(GoalService.GoalType(rawValue: "custom")!)
                             }
                             .pickerStyle(.menu)
-                            HStack { Text("Calories"); Spacer(); Text(String(format: "%.0f kcal", goals.calories)) }
-                            HStack { Text("Protein"); Spacer(); Text(MassUnitFormatter.formatMacro(grams: goals.protein, unitSystem: unitSystem)) }
-                            HStack { Text("Carbs"); Spacer(); Text(MassUnitFormatter.formatMacro(grams: goals.carbohydrates, unitSystem: unitSystem)) }
-                            HStack { Text("Fat"); Spacer(); Text(MassUnitFormatter.formatMacro(grams: goals.fat, unitSystem: unitSystem)) }
+                            if (goals.goalTypeRaw == "custom") {
+                                HStack { Text("Calories"); Spacer();
+                                    TextField("kcal", value: Binding(get: { goals.calories }, set: { goals.calories = $0 }), format: .number.precision(.fractionLength(0)))
+                                        .keyboardType(.numberPad)
+                                        .multilineTextAlignment(.trailing)
+                                }
+                                HStack { Text("Protein"); Spacer();
+                                    TextField("g", value: Binding(get: { goals.protein }, set: { goals.protein = $0 }), format: .number.precision(.fractionLength(0...1)))
+                                        .keyboardType(.decimalPad)
+                                        .multilineTextAlignment(.trailing)
+                                }
+                                HStack { Text("Carbs"); Spacer();
+                                    TextField("g", value: Binding(get: { goals.carbohydrates }, set: { goals.carbohydrates = $0 }), format: .number.precision(.fractionLength(0...1)))
+                                        .keyboardType(.decimalPad)
+                                        .multilineTextAlignment(.trailing)
+                                }
+                                HStack { Text("Fat"); Spacer();
+                                    TextField("g", value: Binding(get: { goals.fat }, set: { goals.fat = $0 }), format: .number.precision(.fractionLength(0...1)))
+                                        .keyboardType(.decimalPad)
+                                        .multilineTextAlignment(.trailing)
+                                }
+                            } else {
+                                HStack { Text("Calories"); Spacer(); Text(String(format: "%.0f kcal", goals.calories)) }
+                                HStack { Text("Protein"); Spacer(); Text(MassUnitFormatter.formatMacro(grams: goals.protein, unitSystem: unitSystem)) }
+                                HStack { Text("Carbs"); Spacer(); Text(MassUnitFormatter.formatMacro(grams: goals.carbohydrates, unitSystem: unitSystem)) }
+                                HStack { Text("Fat"); Spacer(); Text(MassUnitFormatter.formatMacro(grams: goals.fat, unitSystem: unitSystem)) }
+                            }
                         }
                     }
                 }

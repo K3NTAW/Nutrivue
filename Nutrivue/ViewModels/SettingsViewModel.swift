@@ -24,6 +24,7 @@ class SettingsViewModel: ObservableObject {
     @Published var breakfastReminderTime = Date()
     @Published var lunchReminderTime = Date()
     @Published var dinnerReminderTime = Date()
+    @Published var healthIntegrationEnabled: Bool = (UserDefaults.standard.object(forKey: "healthIntegrationEnabled") as? Bool) ?? true
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -71,6 +72,21 @@ class SettingsViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    func disableHealthIntegration() {
+        // App-level switch to stop background sync and hide data; cannot revoke in Health app programmatically
+        UserDefaults.standard.set(false, forKey: "healthIntegrationEnabled")
+        healthIntegrationEnabled = false
+        // Clear in-app cached values
+        userWeight = nil
+        activeEnergy = nil
+        isHealthKitAuthorized = false
+    }
+
+    func enableHealthIntegration() {
+        UserDefaults.standard.set(true, forKey: "healthIntegrationEnabled")
+        healthIntegrationEnabled = true
     }
     
     func refreshHealthKitAuthorizationState() {

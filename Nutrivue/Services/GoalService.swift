@@ -10,7 +10,7 @@ class GoalService {
         .veryActive: 1.9
     ]
     
-    enum GoalType: String, CaseIterable { case maintain, lose, gain, muscle }
+    enum GoalType: String, CaseIterable { case maintain, lose, gain, muscle, custom }
 
     func calculateGoals(for user: User, goal: GoalType = .maintain) -> Goals {
         let bmr = calculateBMR(for: user)
@@ -25,6 +25,8 @@ class GoalService {
             adjustedCalories = tdee * 1.10 // ~10% surplus
         case .muscle:
             adjustedCalories = tdee * 1.05 // small surplus + higher protein
+        case .custom:
+            adjustedCalories = tdee
         }
         // Macro splits
         let (pRatio, cRatio, fRatio): (Double, Double, Double) = {
@@ -33,6 +35,7 @@ class GoalService {
             case .lose: return (0.35, 0.35, 0.30)
             case .gain: return (0.25, 0.50, 0.25)
             case .muscle: return (0.35, 0.35, 0.30)
+            case .custom: return (0.30, 0.40, 0.30)
             }
         }()
         let proteinCalories = adjustedCalories * pRatio

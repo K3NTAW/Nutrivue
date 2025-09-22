@@ -12,6 +12,8 @@ class HealthSyncService {
     func syncIfAuthorized() {
         healthKitService.checkAuthorizationStatus { [weak self] granted in
             guard let self = self, granted else { return }
+            let enabled = UserDefaults.standard.object(forKey: "healthIntegrationEnabled") as? Bool ?? true
+            guard enabled else { return }
             self.syncLatestWeight()
             self.syncActiveEnergy()
         }
