@@ -308,6 +308,8 @@ private struct FoodRow: View {
             Text(String(format: "%.0f kcal", item.calories))
                 .foregroundColor(.secondary)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
     }
 }
 
@@ -335,7 +337,8 @@ private struct MealSectionView: View {
         Section {
             ForEach(meal.items) { item in
                 Button { onTapItem(item) } label: { FoodRow(item: item) }
-                .buttonStyle(.plain)
+                    .buttonStyle(.plain)
+                    .contentShape(Rectangle())
             }
             .onDelete(perform: onDeleteItems)
         } header: {
