@@ -17,18 +17,14 @@ struct SettingsView: View {
         NavigationView {
             Form {
                 Section(header: Text("Integrations")) {
-                    if viewModel.isHealthKitAuthorized && viewModel.healthIntegrationEnabled {
-                        Text("Apple Health Connected")
-                            .foregroundColor(.green)
-                        Text("Syncs automatically")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                    let connected = viewModel.isHealthKitAuthorized && viewModel.healthIntegrationEnabled
+                    HealthStatusBanner(isConnected: connected)
+                        .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                    if connected {
                         Button("Disconnect Apple Health") {
                             viewModel.disableHealthIntegration()
                         }
                     } else {
-                        Text("Apple Health Disconnected")
-                            .foregroundColor(.red)
                         Button("Connect to Apple Health") {
                             viewModel.enableHealthIntegration()
                             viewModel.authorizeHealthKit()
@@ -63,12 +59,18 @@ struct SettingsView: View {
                                 Text(system.rawValue.capitalized).tag(system)
                             }
                         }
+                        .onChange(of: unitSystem) {
+                            if let user = user {
+                                user.unitSystem = unitSystem
+                            }
+                        }
                         
                         TextField("Dietary Notes", text: $dietaryNotes)
-                        
-                        Button("Save Preferences") {
-                            savePreferences()
-                        }
+                            .onChange(of: dietaryNotes) {
+                                if let user = user {
+                                    user.dietaryNotes = dietaryNotes
+                                }
+                            }
                     }
                     
                     Section(header: Text("Goals")) {
@@ -90,25 +92,41 @@ struct SettingsView: View {
                             }
                             .pickerStyle(.menu)
                             if (goals.goalTypeRaw == "custom") {
-                                HStack { Text("Calories"); Spacer();
-                                    TextField("kcal", value: Binding(get: { goals.calories }, set: { goals.calories = $0 }), format: .number.precision(.fractionLength(0)))
-                                        .keyboardType(.numberPad)
-                                        .multilineTextAlignment(.trailing)
+                                HStack {
+                                    Text("Calories"); Spacer()
+                                    HStack(spacing: 6) {
+                                        TextField("0", value: Binding(get: { goals.calories }, set: { goals.calories = $0 }), format: .number.precision(.fractionLength(0)))
+                                            .keyboardType(.numberPad)
+                                            .multilineTextAlignment(.trailing)
+                                        Text("kcal").foregroundColor(.secondary)
+                                    }
                                 }
-                                HStack { Text("Protein"); Spacer();
-                                    TextField("g", value: Binding(get: { goals.protein }, set: { goals.protein = $0 }), format: .number.precision(.fractionLength(0...1)))
-                                        .keyboardType(.decimalPad)
-                                        .multilineTextAlignment(.trailing)
+                                HStack {
+                                    Text("Protein"); Spacer()
+                                    HStack(spacing: 6) {
+                                        TextField("0", value: Binding(get: { goals.protein }, set: { goals.protein = $0 }), format: .number.precision(.fractionLength(0...1)))
+                                            .keyboardType(.decimalPad)
+                                            .multilineTextAlignment(.trailing)
+                                        Text("g").foregroundColor(.secondary)
+                                    }
                                 }
-                                HStack { Text("Carbs"); Spacer();
-                                    TextField("g", value: Binding(get: { goals.carbohydrates }, set: { goals.carbohydrates = $0 }), format: .number.precision(.fractionLength(0...1)))
-                                        .keyboardType(.decimalPad)
-                                        .multilineTextAlignment(.trailing)
+                                HStack {
+                                    Text("Carbs"); Spacer()
+                                    HStack(spacing: 6) {
+                                        TextField("0", value: Binding(get: { goals.carbohydrates }, set: { goals.carbohydrates = $0 }), format: .number.precision(.fractionLength(0...1)))
+                                            .keyboardType(.decimalPad)
+                                            .multilineTextAlignment(.trailing)
+                                        Text("g").foregroundColor(.secondary)
+                                    }
                                 }
-                                HStack { Text("Fat"); Spacer();
-                                    TextField("g", value: Binding(get: { goals.fat }, set: { goals.fat = $0 }), format: .number.precision(.fractionLength(0...1)))
-                                        .keyboardType(.decimalPad)
-                                        .multilineTextAlignment(.trailing)
+                                HStack {
+                                    Text("Fat"); Spacer()
+                                    HStack(spacing: 6) {
+                                        TextField("0", value: Binding(get: { goals.fat }, set: { goals.fat = $0 }), format: .number.precision(.fractionLength(0...1)))
+                                            .keyboardType(.decimalPad)
+                                            .multilineTextAlignment(.trailing)
+                                        Text("g").foregroundColor(.secondary)
+                                    }
                                 }
                             } else {
                                 HStack { Text("Calories"); Spacer(); Text(String(format: "%.0f kcal", goals.calories)) }
@@ -167,16 +185,7 @@ struct SettingsView: View {
         }
     }
     
-    private func savePreferences() {
-        if let user = user {
-            user.unitSystem = unitSystem
-            user.dietaryNotes = dietaryNotes
-            showingSaveConfirmation = true
-            if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {
-                WidgetSnapshotService(modelContainer: container).writeSnapshot()
-            }
-        }
-    }
+    private func savePreferences() { }
     
     private func recalculateGoals(goal: GoalService.GoalType) {
         guard let user = user else { return }
@@ -196,6 +205,30 @@ struct SettingsView: View {
             let pounds = kilograms * 2.2046226218
             return String(format: "%.1f lb", pounds)
         }
+    }
+}
+
+private struct HealthStatusBanner: View {
+    let isConnected: Bool
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: isConnected ? "heart.fill" : "heart.slash")
+                .foregroundColor(isConnected ? .green : .red)
+                .imageScale(.large)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(isConnected ? "Apple Health Connected" : "Apple Health Disconnected")
+                    .font(.subheadline).fontWeight(.semibold)
+                Text(isConnected ? "Syncs automatically" : "Connect to sync health data")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.secondarySystemBackground))
+        )
     }
 }
 
