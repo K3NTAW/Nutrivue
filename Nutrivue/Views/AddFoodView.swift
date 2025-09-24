@@ -20,28 +20,31 @@ struct AddFoodView: View {
     @State private var servingSizeGrams = ""
     
     // Computed properties for calculated values
+    private var inputServingAsGrams: Double {
+        let raw = Double(servingSizeGrams) ?? 0
+        switch unitSystem {
+        case .metric: return raw
+        case .imperial: return raw * 28.349523125 // oz -> g
+        }
+    }
     private var calculatedCalories: Double {
         let baseCalories = product?.nutriments?.energyKcal100g ?? Double(calories) ?? 0
-        let serving = Double(servingSizeGrams) ?? 0
-        return (baseCalories / 100) * serving
+        return (baseCalories / 100) * inputServingAsGrams
     }
     
     private var calculatedProtein: Double {
         let baseProtein = product?.nutriments?.proteins100g ?? Double(protein) ?? 0
-        let serving = Double(servingSizeGrams) ?? 0
-        return (baseProtein / 100) * serving
+        return (baseProtein / 100) * inputServingAsGrams
     }
     
     private var calculatedCarbs: Double {
         let baseCarbs = product?.nutriments?.carbohydrates100g ?? Double(carbs) ?? 0
-        let serving = Double(servingSizeGrams) ?? 0
-        return (baseCarbs / 100) * serving
+        return (baseCarbs / 100) * inputServingAsGrams
     }
     
     private var calculatedFat: Double {
         let baseFat = product?.nutriments?.fat100g ?? Double(fat) ?? 0
-        let serving = Double(servingSizeGrams) ?? 0
-        return (baseFat / 100) * serving
+        return (baseFat / 100) * inputServingAsGrams
     }
     
     var body: some View {
@@ -56,12 +59,12 @@ struct AddFoodView: View {
                                 .keyboardType(.decimalPad)
                                 .textInputAutocapitalization(.never)
                                 .autocorrectionDisabled(true)
-                                .accessibilityLabel("Serving size in grams")
+                                .accessibilityLabel(unitSystem == .metric ? "Serving size in grams" : "Serving size in ounces")
                             Spacer()
-                            Text("g").foregroundColor(.secondary)
+                            Text(unitSystem == .metric ? "g" : "oz").foregroundColor(.secondary)
                         }
                         .accessibilityElement(children: .combine)
-                        .accessibilityHint("Tap to edit grams")
+                        .accessibilityHint(unitSystem == .metric ? "Tap to edit grams" : "Tap to edit ounces")
                     }
                     Section(header: Text("Calculated Nutrition")) {
                         Text("Calories: \(calculatedCalories, specifier: "%.0f") kcal")
@@ -110,7 +113,7 @@ struct AddFoodView: View {
         let finalCarbs = calculatedCarbs
         let finalFat = calculatedFat
         
-        let gramsUsed = Double(servingSizeGrams) ?? 0
+        let gramsUsed = inputServingAsGrams
         let newFood = FoodItem(name: name, calories: finalCalories, protein: finalProtein, carbohydrates: finalCarbs, fat: finalFat, servingGrams: gramsUsed > 0 ? gramsUsed : nil)
         meal.items.append(newFood)
         if let container = try? ModelContainer(for: User.self, Meal.self, FoodItem.self, Goals.self, Supplement.self, SupplementIntake.self, Recipe.self, RecipeIngredient.self) {

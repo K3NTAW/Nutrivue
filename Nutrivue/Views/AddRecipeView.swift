@@ -144,19 +144,21 @@ struct AddRecipeView: View {
     }
     
     private func totalsText() -> String {
+        let unitSystem: UnitSystem = (try? modelContext.fetch(FetchDescriptor<User>()).first?.unitSystem) ?? .metric
         let cal = ingredients.reduce(0) { $0 + $1.totals().cal }
         let p = ingredients.reduce(0) { $0 + $1.totals().p }
         let c = ingredients.reduce(0) { $0 + $1.totals().c }
         let f = ingredients.reduce(0) { $0 + $1.totals().f }
-        return String(format: "%.0f kcal, P %.1f g, C %.1f g, F %.1f g", cal, p, c, f)
+        return "\(String(format: "%.0f", cal)) kcal, P \(MassUnitFormatter.formatMacro(grams: p, unitSystem: unitSystem)), C \(MassUnitFormatter.formatMacro(grams: c, unitSystem: unitSystem)), F \(MassUnitFormatter.formatMacro(grams: f, unitSystem: unitSystem))"
     }
     
     private func perServingText() -> String {
+        let unitSystem: UnitSystem = (try? modelContext.fetch(FetchDescriptor<User>()).first?.unitSystem) ?? .metric
         let cal = ingredients.reduce(0) { $0 + $1.totals().cal } / max(servings, 1)
         let p = ingredients.reduce(0) { $0 + $1.totals().p } / max(servings, 1)
         let c = ingredients.reduce(0) { $0 + $1.totals().c } / max(servings, 1)
         let f = ingredients.reduce(0) { $0 + $1.totals().f } / max(servings, 1)
-        return String(format: "%.0f kcal, P %.1f g, C %.1f g, F %.1f g", cal, p, c, f)
+        return "\(String(format: "%.0f", cal)) kcal, P \(MassUnitFormatter.formatMacro(grams: p, unitSystem: unitSystem)), C \(MassUnitFormatter.formatMacro(grams: c, unitSystem: unitSystem)), F \(MassUnitFormatter.formatMacro(grams: f, unitSystem: unitSystem))"
     }
     
     private func save() {

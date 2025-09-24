@@ -36,6 +36,17 @@ struct RecipesView: View {
                 .onDelete { idx in
                     for i in idx { modelContext.delete(recipes[i]) }
                 }
+                if recipes.isEmpty {
+                    VStack(spacing: 12) {
+                        ContentUnavailableView("No Recipes", systemImage: "fork.knife", description: Text("Tap + to add a recipe."))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .listRowBackground(Color.clear)
+                } else if filteredRecipes.isEmpty && !searchQuery.isEmpty {
+                    ContentUnavailableView.search(text: searchQuery)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .listRowBackground(Color.clear)
+                }
             }
             .navigationTitle("Recipes")
             .searchable(text: $searchQuery)
@@ -45,13 +56,6 @@ struct RecipesView: View {
                 }
             }
             .sheet(isPresented: $showingAdd) { AddRecipeView() }
-            .overlay {
-                if recipes.isEmpty {
-                    ContentUnavailableView("No Recipes", systemImage: "fork.knife", description: Text("Tap the + button to create your first recipe."))
-                } else if filteredRecipes.isEmpty && !searchQuery.isEmpty {
-                    ContentUnavailableView.search(text: searchQuery)
-                }
-            }
         }
     }
 }
@@ -59,6 +63,7 @@ struct RecipesView: View {
 private struct EditRecipeView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Query var users: [User]
     @State private var name: String
     @State private var notes: String
     @State private var servings: Double
@@ -87,7 +92,11 @@ private struct EditRecipeView: View {
                     HStack {
                         Text(ing.name)
                         Spacer()
-                        Text(String(format: "%.0f g", ing.amountGrams)).foregroundColor(.secondary)
+                        let unitSystem: UnitSystem = users.first?.unitSystem ?? .metric
+                        let isImp = unitSystem == .imperial
+                        let unit = isImp ? "oz" : "g"
+                        let display = isImp ? (ing.amountGrams / 28.349523125) : ing.amountGrams
+                        Text(String(format: "%.0f %@", display, unit)).foregroundColor(.secondary)
                     }
                 }
             }

@@ -32,6 +32,16 @@ struct SupplementsView: View {
                     }
                 }
                 .onDelete(perform: delete)
+
+                if supplements.isEmpty {
+                    ContentUnavailableView("No Supplements", systemImage: "pills", description: Text("Tap the + button to add your first supplement."))
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .listRowBackground(Color.clear)
+                } else if filteredSupplements.isEmpty && !searchQuery.isEmpty {
+                    ContentUnavailableView.search(text: searchQuery)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .listRowBackground(Color.clear)
+                }
             }
             .navigationTitle("Supplements")
             .searchable(text: $searchQuery)
@@ -46,13 +56,6 @@ struct SupplementsView: View {
             }
             .sheet(isPresented: $showingAddSupplement) {
                 AddSupplementView()
-            }
-            .overlay {
-                if supplements.isEmpty {
-                    ContentUnavailableView("No Supplements", systemImage: "pills", description: Text("Tap the + button to add your first supplement."))
-                } else if filteredSupplements.isEmpty && !searchQuery.isEmpty {
-                    ContentUnavailableView.search(text: searchQuery)
-                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .quickAddSupplement)) { _ in
