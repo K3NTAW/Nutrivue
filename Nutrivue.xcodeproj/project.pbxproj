@@ -534,8 +534,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Nutrivue;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Nutrivue needs access to your camera to scan food barcodes.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrivue needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
+                INFOPLIST_KEY_NSCameraUsageDescription = "Nutrivue needs camera access to scan barcodes and recipe photos.";
+                INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Nutrivue needs photo access to import recipe images for text recognition.";
+                INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrivue needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -579,8 +580,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Nutrivue;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Nutrivue needs access to your camera to scan food barcodes.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrivue needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
+                INFOPLIST_KEY_NSCameraUsageDescription = "Nutrivue needs camera access to scan barcodes and recipe photos.";
+                INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Nutrivue needs photo access to import recipe images for text recognition.";
+                INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrivue needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
