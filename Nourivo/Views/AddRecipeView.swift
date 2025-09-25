@@ -261,10 +261,10 @@ private struct IngredientSearchView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .searchable(text: $searchVM.searchQuery)
+                .modifier(ConditionalSearchable(searchQuery: $searchVM.searchQuery, showSearch: searchVM.recentSearches.isEmpty))
                 .onAppear { searchVM.activate() }
                 .overlay {
-                    if searchVM.searchQuery.isEmpty && searchVM.searchResults.isEmpty {
+                    if searchVM.searchQuery.isEmpty && searchVM.searchResults.isEmpty && searchVM.recentSearches.isEmpty {
                         ContentUnavailableView("Search for Ingredients", systemImage: "magnifyingglass")
                     } else if !searchVM.searchQuery.isEmpty && searchVM.searchResults.isEmpty {
                         ContentUnavailableView.search(text: searchVM.searchQuery)
@@ -288,6 +288,19 @@ private struct IngredientSearchView: View {
                     pickedProduct = nil
                 })
             }
+        }
+    }
+}
+
+struct ConditionalSearchable: ViewModifier {
+    @Binding var searchQuery: String
+    let showSearch: Bool
+    
+    func body(content: Content) -> some View {
+        if showSearch {
+            content.searchable(text: $searchQuery)
+        } else {
+            content
         }
     }
 }

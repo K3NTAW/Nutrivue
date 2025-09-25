@@ -68,14 +68,14 @@ struct FoodSearchView: View {
                 }
             }
             .overlay {
-                if viewModel.searchQuery.isEmpty && viewModel.searchResults.isEmpty {
+                if viewModel.searchQuery.isEmpty && viewModel.searchResults.isEmpty && viewModel.favorites.isEmpty && viewModel.recentSearches.isEmpty {
                     ContentUnavailableView("Search for Food", systemImage: "magnifyingglass")
                 } else if !viewModel.searchQuery.isEmpty && viewModel.searchResults.isEmpty && !viewModel.isLoading {
                     ContentUnavailableView.search(text: viewModel.searchQuery)
                 }
             }
             .navigationTitle("Search Food")
-            .searchable(text: $viewModel.searchQuery)
+            .modifier(ConditionalSearchable(searchQuery: $viewModel.searchQuery, showSearch: viewModel.favorites.isEmpty && viewModel.recentSearches.isEmpty))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -95,6 +95,19 @@ struct FoodSearchView: View {
             .onAppear {
                 viewModel.activate()
             }
+        }
+    }
+}
+
+struct ConditionalSearchable: ViewModifier {
+    @Binding var searchQuery: String
+    let showSearch: Bool
+    
+    func body(content: Content) -> some View {
+        if showSearch {
+            content.searchable(text: $searchQuery)
+        } else {
+            content
         }
     }
 }
