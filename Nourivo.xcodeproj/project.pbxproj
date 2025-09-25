@@ -528,6 +528,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Nourivo needs camera access to scan barcodes and recipe photos.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nourivo needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Nourivo uses Apple Health to sync your weight and activity data to provide personalized nutrition recommendations and track your health progress. This helps us calculate your daily calorie and macro goals more accurately.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Nourivo needs photo access to import recipe images for text recognition.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -574,6 +575,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Nourivo needs camera access to scan barcodes and recipe photos.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nourivo needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Nourivo uses Apple Health to sync your weight and activity data to provide personalized nutrition recommendations and track your health progress. This helps us calculate your daily calorie and macro goals more accurately.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Nourivo needs photo access to import recipe images for text recognition.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
