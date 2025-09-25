@@ -98,16 +98,3 @@ struct FoodSearchView: View {
         }
     }
 }
-
-struct ConditionalSearchable: ViewModifier {
-    @Binding var searchQuery: String
-    let showSearch: Bool
-    
-    func body(content: Content) -> some View {
-        if showSearch {
-            content.searchable(text: $searchQuery)
-        } else {
-            content
-        }
-    }
-}
