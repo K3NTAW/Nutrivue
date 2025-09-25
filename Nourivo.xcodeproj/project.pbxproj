@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3878DB172E7AEAE2005F4FE3 /* OpenFoodFactsSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 3878DB162E7AEAE2005F4FE3 /* OpenFoodFactsSDK */; };
 		387CAEC82E7C0C1200D83F37 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 387CAEC72E7C0C1200D83F37 /* WidgetKit.framework */; };
 		387CAECA2E7C0C1200D83F37 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 387CAEC92E7C0C1200D83F37 /* SwiftUI.framework */; };
-		387CAED92E7C0C1400D83F37 /* NutrivueWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 387CAEC62E7C0C1200D83F37 /* NutrivueWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		387CAED92E7C0C1400D83F37 /* NourivoWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 387CAEC62E7C0C1200D83F37 /* NourivoWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		38F7F2FB2E8542C000F2EFFC /* OpenFoodFactsSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 38F7F2FA2E8542C000F2EFFC /* OpenFoodFactsSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -19,21 +19,21 @@
 			containerPortal = 3878DAB12E7AE4BF005F4FE3 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 3878DAB82E7AE4BF005F4FE3;
-			remoteInfo = Nutrivue;
+			remoteInfo = Nourivo;
 		};
 		3878DAD22E7AE4C1005F4FE3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3878DAB12E7AE4BF005F4FE3 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 3878DAB82E7AE4BF005F4FE3;
-			remoteInfo = Nutrivue;
+			remoteInfo = Nourivo;
 		};
 		387CAED72E7C0C1400D83F37 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3878DAB12E7AE4BF005F4FE3 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 387CAEC52E7C0C1200D83F37;
-			remoteInfo = NutrivueWidgetsExtension;
+			remoteInfo = NourivoWidgetsExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -44,7 +44,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				387CAED92E7C0C1400D83F37 /* NutrivueWidgetsExtension.appex in Embed Foundation Extensions */,
+				387CAED92E7C0C1400D83F37 /* NourivoWidgetsExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -52,57 +52,48 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3878DAB92E7AE4BF005F4FE3 /* Nutrivue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nutrivue.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3878DAC72E7AE4C1005F4FE3 /* NutrivueTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NutrivueTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		3878DAD12E7AE4C1005F4FE3 /* NutrivueUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NutrivueUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		387CAEC62E7C0C1200D83F37 /* NutrivueWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NutrivueWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		3878DAB92E7AE4BF005F4FE3 /* Nourivo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nourivo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3878DAC72E7AE4C1005F4FE3 /* NourivoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NourivoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3878DAD12E7AE4C1005F4FE3 /* NourivoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NourivoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		387CAEC62E7C0C1200D83F37 /* NourivoWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NourivoWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		387CAEC72E7C0C1200D83F37 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		387CAEC92E7C0C1200D83F37 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		387CAEF12E7C189B00D83F37 /* NutrivueWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NutrivueWidgetsExtension.entitlements; sourceTree = "<group>"; };
+		387CAEF12E7C189B00D83F37 /* NourivoWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NourivoWidgetsExtension.entitlements; sourceTree = "<group>"; };
+		387CAEF22E7C189B00D83F38 /* NourivoWidgetsInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = NourivoWidgetsInfo.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3878DB142E7AEAAC005F4FE3 /* Exceptions for "Nutrivue" folder in "Nutrivue" target */ = {
+		3878DB142E7AEAAC005F4FE3 /* Exceptions for "Nourivo" folder in "Nourivo" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				ContentView.swift,
 			);
-			target = 3878DAB82E7AE4BF005F4FE3 /* Nutrivue */;
-		};
-		387CAEDD2E7C0C1400D83F37 /* Exceptions for "NutrivueWidgets" folder in "NutrivueWidgetsExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 387CAEC52E7C0C1200D83F37 /* NutrivueWidgetsExtension */;
+			target = 3878DAB82E7AE4BF005F4FE3 /* Nourivo */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		3878DABB2E7AE4BF005F4FE3 /* Nutrivue */ = {
+		3878DABB2E7AE4BF005F4FE3 /* Nourivo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				3878DB142E7AEAAC005F4FE3 /* Exceptions for "Nutrivue" folder in "Nutrivue" target */,
+				3878DB142E7AEAAC005F4FE3 /* Exceptions for "Nourivo" folder in "Nourivo" target */,
 			);
-			path = Nutrivue;
+			path = Nourivo;
 			sourceTree = "<group>";
 		};
-		3878DACA2E7AE4C1005F4FE3 /* NutrivueTests */ = {
+		3878DACA2E7AE4C1005F4FE3 /* NourivoTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = NutrivueTests;
+			path = NourivoTests;
 			sourceTree = "<group>";
 		};
-		3878DAD42E7AE4C1005F4FE3 /* NutrivueUITests */ = {
+		3878DAD42E7AE4C1005F4FE3 /* NourivoUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = NutrivueUITests;
+			path = NourivoUITests;
 			sourceTree = "<group>";
 		};
-		387CAECB2E7C0C1200D83F37 /* NutrivueWidgets */ = {
+		387CAECB2E7C0C1200D83F37 /* NourivoWidgets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				387CAEDD2E7C0C1400D83F37 /* Exceptions for "NutrivueWidgets" folder in "NutrivueWidgetsExtension" target */,
-			);
-			path = NutrivueWidgets;
+			path = NourivoWidgets;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -112,7 +103,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3878DB172E7AEAE2005F4FE3 /* OpenFoodFactsSDK in Frameworks */,
+				38F7F2FB2E8542C000F2EFFC /* OpenFoodFactsSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,11 +136,12 @@
 		3878DAB02E7AE4BF005F4FE3 = {
 			isa = PBXGroup;
 			children = (
-				387CAEF12E7C189B00D83F37 /* NutrivueWidgetsExtension.entitlements */,
-				3878DABB2E7AE4BF005F4FE3 /* Nutrivue */,
-				3878DACA2E7AE4C1005F4FE3 /* NutrivueTests */,
-				3878DAD42E7AE4C1005F4FE3 /* NutrivueUITests */,
-				387CAECB2E7C0C1200D83F37 /* NutrivueWidgets */,
+				387CAEF12E7C189B00D83F37 /* NourivoWidgetsExtension.entitlements */,
+				387CAEF22E7C189B00D83F38 /* NourivoWidgetsInfo.plist */,
+				3878DABB2E7AE4BF005F4FE3 /* Nourivo */,
+				3878DACA2E7AE4C1005F4FE3 /* NourivoTests */,
+				3878DAD42E7AE4C1005F4FE3 /* NourivoUITests */,
+				387CAECB2E7C0C1200D83F37 /* NourivoWidgets */,
 				3878DB152E7AEAE2005F4FE3 /* Frameworks */,
 				3878DABA2E7AE4BF005F4FE3 /* Products */,
 			);
@@ -158,10 +150,10 @@
 		3878DABA2E7AE4BF005F4FE3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3878DAB92E7AE4BF005F4FE3 /* Nutrivue.app */,
-				3878DAC72E7AE4C1005F4FE3 /* NutrivueTests.xctest */,
-				3878DAD12E7AE4C1005F4FE3 /* NutrivueUITests.xctest */,
-				387CAEC62E7C0C1200D83F37 /* NutrivueWidgetsExtension.appex */,
+				3878DAB92E7AE4BF005F4FE3 /* Nourivo.app */,
+				3878DAC72E7AE4C1005F4FE3 /* NourivoTests.xctest */,
+				3878DAD12E7AE4C1005F4FE3 /* NourivoUITests.xctest */,
+				387CAEC62E7C0C1200D83F37 /* NourivoWidgetsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -178,9 +170,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3878DAB82E7AE4BF005F4FE3 /* Nutrivue */ = {
+		3878DAB82E7AE4BF005F4FE3 /* Nourivo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3878DADB2E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "Nutrivue" */;
+			buildConfigurationList = 3878DADB2E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "Nourivo" */;
 			buildPhases = (
 				3878DAB52E7AE4BF005F4FE3 /* Sources */,
 				3878DAB62E7AE4BF005F4FE3 /* Frameworks */,
@@ -193,19 +185,19 @@
 				387CAED82E7C0C1400D83F37 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				3878DABB2E7AE4BF005F4FE3 /* Nutrivue */,
+				3878DABB2E7AE4BF005F4FE3 /* Nourivo */,
 			);
-			name = Nutrivue;
+			name = Nourivo;
 			packageProductDependencies = (
-				3878DB162E7AEAE2005F4FE3 /* OpenFoodFactsSDK */,
+				38F7F2FA2E8542C000F2EFFC /* OpenFoodFactsSDK */,
 			);
-			productName = Nutrivue;
-			productReference = 3878DAB92E7AE4BF005F4FE3 /* Nutrivue.app */;
+			productName = Nourivo;
+			productReference = 3878DAB92E7AE4BF005F4FE3 /* Nourivo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3878DAC62E7AE4C1005F4FE3 /* NutrivueTests */ = {
+		3878DAC62E7AE4C1005F4FE3 /* NourivoTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3878DADE2E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "NutrivueTests" */;
+			buildConfigurationList = 3878DADE2E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "NourivoTests" */;
 			buildPhases = (
 				3878DAC32E7AE4C1005F4FE3 /* Sources */,
 				3878DAC42E7AE4C1005F4FE3 /* Frameworks */,
@@ -217,18 +209,18 @@
 				3878DAC92E7AE4C1005F4FE3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				3878DACA2E7AE4C1005F4FE3 /* NutrivueTests */,
+				3878DACA2E7AE4C1005F4FE3 /* NourivoTests */,
 			);
-			name = NutrivueTests;
+			name = NourivoTests;
 			packageProductDependencies = (
 			);
-			productName = NutrivueTests;
-			productReference = 3878DAC72E7AE4C1005F4FE3 /* NutrivueTests.xctest */;
+			productName = NourivoTests;
+			productReference = 3878DAC72E7AE4C1005F4FE3 /* NourivoTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		3878DAD02E7AE4C1005F4FE3 /* NutrivueUITests */ = {
+		3878DAD02E7AE4C1005F4FE3 /* NourivoUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3878DAE12E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "NutrivueUITests" */;
+			buildConfigurationList = 3878DAE12E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "NourivoUITests" */;
 			buildPhases = (
 				3878DACD2E7AE4C1005F4FE3 /* Sources */,
 				3878DACE2E7AE4C1005F4FE3 /* Frameworks */,
@@ -240,18 +232,18 @@
 				3878DAD32E7AE4C1005F4FE3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				3878DAD42E7AE4C1005F4FE3 /* NutrivueUITests */,
+				3878DAD42E7AE4C1005F4FE3 /* NourivoUITests */,
 			);
-			name = NutrivueUITests;
+			name = NourivoUITests;
 			packageProductDependencies = (
 			);
-			productName = NutrivueUITests;
-			productReference = 3878DAD12E7AE4C1005F4FE3 /* NutrivueUITests.xctest */;
+			productName = NourivoUITests;
+			productReference = 3878DAD12E7AE4C1005F4FE3 /* NourivoUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		387CAEC52E7C0C1200D83F37 /* NutrivueWidgetsExtension */ = {
+		387CAEC52E7C0C1200D83F37 /* NourivoWidgetsExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 387CAEDA2E7C0C1400D83F37 /* Build configuration list for PBXNativeTarget "NutrivueWidgetsExtension" */;
+			buildConfigurationList = 387CAEDA2E7C0C1400D83F37 /* Build configuration list for PBXNativeTarget "NourivoWidgetsExtension" */;
 			buildPhases = (
 				387CAEC22E7C0C1200D83F37 /* Sources */,
 				387CAEC32E7C0C1200D83F37 /* Frameworks */,
@@ -262,13 +254,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				387CAECB2E7C0C1200D83F37 /* NutrivueWidgets */,
+				387CAECB2E7C0C1200D83F37 /* NourivoWidgets */,
 			);
-			name = NutrivueWidgetsExtension;
+			name = NourivoWidgetsExtension;
 			packageProductDependencies = (
 			);
-			productName = NutrivueWidgetsExtension;
-			productReference = 387CAEC62E7C0C1200D83F37 /* NutrivueWidgetsExtension.appex */;
+			productName = NourivoWidgetsExtension;
+			productReference = 387CAEC62E7C0C1200D83F37 /* NourivoWidgetsExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -297,7 +289,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 3878DAB42E7AE4BF005F4FE3 /* Build configuration list for PBXProject "Nutrivue" */;
+			buildConfigurationList = 3878DAB42E7AE4BF005F4FE3 /* Build configuration list for PBXProject "Nourivo" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -314,10 +306,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3878DAB82E7AE4BF005F4FE3 /* Nutrivue */,
-				3878DAC62E7AE4C1005F4FE3 /* NutrivueTests */,
-				3878DAD02E7AE4C1005F4FE3 /* NutrivueUITests */,
-				387CAEC52E7C0C1200D83F37 /* NutrivueWidgetsExtension */,
+				3878DAB82E7AE4BF005F4FE3 /* Nourivo */,
+				3878DAC62E7AE4C1005F4FE3 /* NourivoTests */,
+				3878DAD02E7AE4C1005F4FE3 /* NourivoUITests */,
+				387CAEC52E7C0C1200D83F37 /* NourivoWidgetsExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -387,17 +379,17 @@
 /* Begin PBXTargetDependency section */
 		3878DAC92E7AE4C1005F4FE3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3878DAB82E7AE4BF005F4FE3 /* Nutrivue */;
+			target = 3878DAB82E7AE4BF005F4FE3 /* Nourivo */;
 			targetProxy = 3878DAC82E7AE4C1005F4FE3 /* PBXContainerItemProxy */;
 		};
 		3878DAD32E7AE4C1005F4FE3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3878DAB82E7AE4BF005F4FE3 /* Nutrivue */;
+			target = 3878DAB82E7AE4BF005F4FE3 /* Nourivo */;
 			targetProxy = 3878DAD22E7AE4C1005F4FE3 /* PBXContainerItemProxy */;
 		};
 		387CAED82E7C0C1400D83F37 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 387CAEC52E7C0C1200D83F37 /* NutrivueWidgetsExtension */;
+			target = 387CAEC52E7C0C1200D83F37 /* NourivoWidgetsExtension */;
 			targetProxy = 387CAED72E7C0C1400D83F37 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -525,18 +517,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CODE_SIGN_ENTITLEMENTS = Nutrivue/Nutrivue.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Nourivo/Nourivo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P4A5UGDGM4;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Nutrivue;
+				INFOPLIST_KEY_CFBundleDisplayName = Nourivo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
-                INFOPLIST_KEY_NSCameraUsageDescription = "Nutrivue needs camera access to scan barcodes and recipe photos.";
-                INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Nutrivue needs photo access to import recipe images for text recognition.";
-                INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrivue needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Nourivo needs camera access to scan barcodes and recipe photos.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nourivo needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Nourivo needs photo access to import recipe images for text recognition.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -552,7 +544,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.Nutrivue;
+				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.Nourivo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -571,18 +563,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CODE_SIGN_ENTITLEMENTS = Nutrivue/Nutrivue.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Nourivo/Nourivo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P4A5UGDGM4;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Nutrivue;
+				INFOPLIST_KEY_CFBundleDisplayName = Nourivo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
-                INFOPLIST_KEY_NSCameraUsageDescription = "Nutrivue needs camera access to scan barcodes and recipe photos.";
-                INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Nutrivue needs photo access to import recipe images for text recognition.";
-                INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrivue needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Nourivo needs camera access to scan barcodes and recipe photos.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nourivo needs access to your health data to sync your weight and activity, which helps in personalizing your nutritional goals.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Nourivo needs photo access to import recipe images for text recognition.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -598,7 +590,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.Nutrivue;
+				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.Nourivo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -622,14 +614,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.NutrivueTests;
+				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.NourivoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nutrivue.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nutrivue";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nourivo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nourivo";
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Debug;
@@ -645,14 +637,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.NutrivueTests;
+				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.NourivoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nutrivue.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nutrivue";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nourivo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nourivo";
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Release;
@@ -667,14 +659,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.NutrivueUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.NourivoUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = Nutrivue;
+				TEST_TARGET_NAME = Nourivo;
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Debug;
@@ -689,14 +681,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.NutrivueUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.NourivoUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = Nutrivue;
+				TEST_TARGET_NAME = Nourivo;
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Release;
@@ -706,13 +698,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = NutrivueWidgetsExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = NourivoWidgetsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P4A5UGDGM4;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = NutrivueWidgets/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = NutrivueWidgets;
+				INFOPLIST_FILE = NourivoWidgetsInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NourivoWidgets;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -721,7 +713,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.Nutrivue.NutrivueWidgets;
+				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.Nourivo.NourivoWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -737,13 +729,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = NutrivueWidgetsExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = NourivoWidgetsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P4A5UGDGM4;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = NutrivueWidgets/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = NutrivueWidgets;
+				INFOPLIST_FILE = NourivoWidgetsInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NourivoWidgets;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -752,7 +744,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.Nutrivue.NutrivueWidgets;
+				PRODUCT_BUNDLE_IDENTIFIER = k3ntaw.Nourivo.NourivoWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -766,7 +758,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3878DAB42E7AE4BF005F4FE3 /* Build configuration list for PBXProject "Nutrivue" */ = {
+		3878DAB42E7AE4BF005F4FE3 /* Build configuration list for PBXProject "Nourivo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3878DAD92E7AE4C1005F4FE3 /* Debug */,
@@ -775,7 +767,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3878DADB2E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "Nutrivue" */ = {
+		3878DADB2E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "Nourivo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3878DADC2E7AE4C1005F4FE3 /* Debug */,
@@ -784,7 +776,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3878DADE2E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "NutrivueTests" */ = {
+		3878DADE2E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "NourivoTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3878DADF2E7AE4C1005F4FE3 /* Debug */,
@@ -793,7 +785,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3878DAE12E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "NutrivueUITests" */ = {
+		3878DAE12E7AE4C1005F4FE3 /* Build configuration list for PBXNativeTarget "NourivoUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3878DAE22E7AE4C1005F4FE3 /* Debug */,
@@ -802,7 +794,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		387CAEDA2E7C0C1400D83F37 /* Build configuration list for PBXNativeTarget "NutrivueWidgetsExtension" */ = {
+		387CAEDA2E7C0C1400D83F37 /* Build configuration list for PBXNativeTarget "NourivoWidgetsExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				387CAEDB2E7C0C1400D83F37 /* Debug */,
@@ -825,7 +817,7 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3878DB162E7AEAE2005F4FE3 /* OpenFoodFactsSDK */ = {
+		38F7F2FA2E8542C000F2EFFC /* OpenFoodFactsSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3878DB0F2E7AE9C5005F4FE3 /* XCRemoteSwiftPackageReference "openfoodfacts-swift" */;
 			productName = OpenFoodFactsSDK;

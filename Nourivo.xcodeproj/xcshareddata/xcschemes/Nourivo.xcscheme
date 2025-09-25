@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3878DAB82E7AE4BF005F4FE3"
-               BuildableName = "Nutrivue.app"
-               BlueprintName = "Nutrivue"
-               ReferencedContainer = "container:Nutrivue.xcodeproj">
+               BuildableName = "Nourivo.app"
+               BlueprintName = "Nourivo"
+               ReferencedContainer = "container:Nourivo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,9 +36,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3878DAC62E7AE4C1005F4FE3"
-               BuildableName = "NutrivueTests.xctest"
-               BlueprintName = "NutrivueTests"
-               ReferencedContainer = "container:Nutrivue.xcodeproj">
+               BuildableName = "NourivoTests.xctest"
+               BlueprintName = "NourivoTests"
+               ReferencedContainer = "container:Nourivo.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -47,9 +47,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3878DAD02E7AE4C1005F4FE3"
-               BuildableName = "NutrivueUITests.xctest"
-               BlueprintName = "NutrivueUITests"
-               ReferencedContainer = "container:Nutrivue.xcodeproj">
+               BuildableName = "NourivoUITests.xctest"
+               BlueprintName = "NourivoUITests"
+               ReferencedContainer = "container:Nourivo.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -69,9 +69,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3878DAB82E7AE4BF005F4FE3"
-            BuildableName = "Nutrivue.app"
-            BlueprintName = "Nutrivue"
-            ReferencedContainer = "container:Nutrivue.xcodeproj">
+            BuildableName = "Nourivo.app"
+            BlueprintName = "Nourivo"
+            ReferencedContainer = "container:Nourivo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -86,9 +86,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3878DAB82E7AE4BF005F4FE3"
-            BuildableName = "Nutrivue.app"
-            BlueprintName = "Nutrivue"
-            ReferencedContainer = "container:Nutrivue.xcodeproj">
+            BuildableName = "Nourivo.app"
+            BlueprintName = "Nourivo"
+            ReferencedContainer = "container:Nourivo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -1,13 +1,13 @@
 //
-//  NutrivueUITests.swift
-//  NutrivueUITests
+//  NourivoUITests.swift
+//  NourivoUITests
 //
 //  Created by Kenta Waibel on 17.09.2025.
 //
 
 import XCTest
 
-final class NutrivueUITests: XCTestCase {
+final class NourivoUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

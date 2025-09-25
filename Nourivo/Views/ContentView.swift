@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  Nutrivue
+//  Nourivo
 //
 //  Created by Kenta Waibel on 17.09.2025.
 //

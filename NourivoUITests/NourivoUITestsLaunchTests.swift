@@ -1,13 +1,13 @@
 //
-//  NutrivueUITestsLaunchTests.swift
-//  NutrivueUITests
+//  NourivoUITestsLaunchTests.swift
+//  NourivoUITests
 //
 //  Created by Kenta Waibel on 17.09.2025.
 //
 
 import XCTest
 
-final class NutrivueUITestsLaunchTests: XCTestCase {
+final class NourivoUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

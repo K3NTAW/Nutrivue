@@ -1,14 +1,22 @@
 //
-//  NutrivueTests.swift
-//  NutrivueTests
+//  NourivoTests.swift
+//  NourivoTests
 //
 //  Created by Kenta Waibel on 17.09.2025.
 //
 
-import Testing
-@testable import Nutrivue
+import XCTest
+@testable import Nourivo
 
-struct NutrivueTests {
+final class NourivoTests: XCTestCase {
+
+    override func setUpWithError() throws {
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+    }
+
+    override func tearDownWithError() throws {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    }
 
     let goalService = GoalService()
 

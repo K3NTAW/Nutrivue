@@ -1,6 +1,6 @@
 //
-//  NutrivueWidgets.swift
-//  NutrivueWidgets
+//  NourivoWidgets.swift
+//  NourivoWidgets
 //
 //  Created by Kenta Waibel on 18.09.2025.
 //
@@ -43,7 +43,7 @@ struct SimpleEntry: TimelineEntry {
     let emoji: String
 }
 
-struct NutrivueWidgetsEntryView : View {
+struct NourivoWidgetsEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
@@ -57,12 +57,12 @@ struct NutrivueWidgetsEntryView : View {
     }
 }
 
-struct NutrivueWidgets: Widget {
-    let kind: String = "NutrivueWidgets"
+struct NourivoWidgets: Widget {
+    let kind: String = "NourivoWidgets"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            NutrivueWidgetsEntryView(entry: entry)
+            NourivoWidgetsEntryView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("My Widget")
@@ -71,7 +71,7 @@ struct NutrivueWidgets: Widget {
 }
 
 #Preview(as: .systemSmall) {
-    NutrivueWidgets()
+    NourivoWidgets()
 } timeline: {
     SimpleEntry(date: .now, emoji: "😀")
     SimpleEntry(date: .now, emoji: "🤩")

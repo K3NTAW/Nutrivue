@@ -4,12 +4,12 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Nutrivue.xcscheme_^#shared#^_</key>
+		<key>Nourivo.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
-		<key>NutrivueWidgetsExtension.xcscheme_^#shared#^_</key>
+		<key>NourivoWidgetsExtension.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>2</integer>

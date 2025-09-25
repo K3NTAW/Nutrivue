@@ -1,6 +1,6 @@
 //
-//  NutrivueApp.swift
-//  Nutrivue
+//  NourivoApp.swift
+//  Nourivo
 //
 //  Created by Kenta Waibel on 17.09.2025.
 //
@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct NutrivueApp: App {
+struct NourivoApp: App {
     @Environment(\.modelContext) private var modelContext
     var body: some Scene {
         WindowGroup {
