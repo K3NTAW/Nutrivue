@@ -11,59 +11,110 @@ struct FoodSearchView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                if viewModel.isLoading {
-                    ProgressView()
-                }
-                List {
-                    if !viewModel.favorites.isEmpty || !viewModel.recentSearches.isEmpty {
-                        if !viewModel.favorites.isEmpty {
-                            Section("Favorites") {
-                                ForEach(viewModel.favorites) { product in
-                                    Button(action: {
-                                        selectedProduct = product
-                                        viewModel.recordSelection(product)
-                                    }) {
-                                        SearchRow(product: product, query: viewModel.searchQuery, isFavorite: true) {
-                                            viewModel.toggleFavorite(product)
-                                        }
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
+            ZStack {
+                // Background
+                DesignSystem.Colors.adaptiveBackground()
+                    .ignoresSafeArea()
+                
+                VStack {
+                    if viewModel.isLoading {
+                        VStack(spacing: DesignSystem.Spacing.md) {
+                            ProgressView()
+                                .tint(DesignSystem.Colors.accent)
+                            Text("Searching...")
+                                .font(DesignSystem.Typography.subheadline)
+                                .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
                         }
-                        if !viewModel.recentSearches.isEmpty {
-                            Section(header: HStack {
-                                Text("Recent Searches")
-                                Spacer()
-                                Button("Clear") {
-                                    viewModel.clearRecents()
-                                }
-                            }) {
-                                ForEach(viewModel.recentSearches) { product in
-                                    Button(action: {
-                                        selectedProduct = product
-                                        viewModel.recordSelection(product)
-                                    }) {
-                                        SearchRow(product: product, query: viewModel.searchQuery, isFavorite: viewModel.isFavorite(product)) {
-                                            viewModel.toggleFavorite(product)
-                                        }
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    ForEach(viewModel.searchResults) { product in
-                        Button(action: {
-                            selectedProduct = product
-                            viewModel.recordSelection(product)
-                        }) {
-                            SearchRow(product: product, query: viewModel.searchQuery, isFavorite: viewModel.isFavorite(product)) {
-                                viewModel.toggleFavorite(product)
+                    
+                    ScrollView {
+                        LazyVStack(spacing: DesignSystem.Spacing.sm) {
+                            // Favorites Section
+                            if !viewModel.favorites.isEmpty {
+                                VStack(alignment: .leading, spacing: DesignSystem.Spacing.sm) {
+                                    HStack {
+                                        Image(systemName: "heart.fill")
+                                            .foregroundColor(DesignSystem.Colors.accent)
+                                            .font(.title3)
+                                        
+                                        Text("Favorites")
+                                            .font(DesignSystem.Typography.title3)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                                        
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal, DesignSystem.Spacing.md)
+                                    
+                                    ForEach(viewModel.favorites) { product in
+                                        Button(action: {
+                                            selectedProduct = product
+                                            viewModel.recordSelection(product)
+                                        }) {
+                                            SearchRow(product: product, query: viewModel.searchQuery, isFavorite: true) {
+                                                viewModel.toggleFavorite(product)
+                                            }
+                                        }
+                                        .buttonStyle(.plain)
+                                        .padding(.horizontal, DesignSystem.Spacing.md)
+                                    }
+                                }
+                            }
+                            
+                            // Recent Searches Section
+                            if !viewModel.recentSearches.isEmpty {
+                                VStack(alignment: .leading, spacing: DesignSystem.Spacing.sm) {
+                                    HStack {
+                                        Image(systemName: "clock.fill")
+                                            .foregroundColor(DesignSystem.Colors.accent)
+                                            .font(.title3)
+                                        
+                                        Text("Recent Searches")
+                                            .font(DesignSystem.Typography.title3)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                                        
+                                        Spacer()
+                                        
+                                        Button("Clear") {
+                                            viewModel.clearRecents()
+                                        }
+                                        .font(DesignSystem.Typography.caption)
+                                        .foregroundColor(DesignSystem.Colors.accent)
+                                    }
+                                    .padding(.horizontal, DesignSystem.Spacing.md)
+                                    
+                                    ForEach(viewModel.recentSearches) { product in
+                                        Button(action: {
+                                            selectedProduct = product
+                                            viewModel.recordSelection(product)
+                                        }) {
+                                            SearchRow(product: product, query: viewModel.searchQuery, isFavorite: viewModel.isFavorite(product)) {
+                                                viewModel.toggleFavorite(product)
+                                            }
+                                        }
+                                        .buttonStyle(.plain)
+                                        .padding(.horizontal, DesignSystem.Spacing.md)
+                                    }
+                                }
+                            }
+                            
+                            // Search Results
+                            ForEach(viewModel.searchResults) { product in
+                                Button(action: {
+                                    selectedProduct = product
+                                    viewModel.recordSelection(product)
+                                }) {
+                                    SearchRow(product: product, query: viewModel.searchQuery, isFavorite: viewModel.isFavorite(product)) {
+                                        viewModel.toggleFavorite(product)
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.horizontal, DesignSystem.Spacing.md)
                             }
                         }
-                        .buttonStyle(.plain)
+                        .padding(.top, DesignSystem.Spacing.sm)
                     }
                 }
             }
@@ -75,7 +126,7 @@ struct FoodSearchView: View {
                 }
             }
             .navigationTitle("Search Food")
-            .modifier(ConditionalSearchable(searchQuery: $viewModel.searchQuery, showSearch: viewModel.favorites.isEmpty && viewModel.recentSearches.isEmpty))
+            .searchable(text: $viewModel.searchQuery)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }

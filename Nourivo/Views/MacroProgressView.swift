@@ -21,23 +21,76 @@ struct MacroProgressView: View {
     private var unitSystem: UnitSystem { users.first?.unitSystem ?? .metric }
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: DesignSystem.Spacing.sm) {
+            // Header with macro name and values
             HStack {
                 Text(name)
+                    .font(DesignSystem.Typography.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                
                 Spacer()
-                Text("\(MassUnitFormatter.formatMacro(grams: current, unitSystem: unitSystem)) / \(MassUnitFormatter.formatMacro(grams: goal, unitSystem: unitSystem))")
+                
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("\(MassUnitFormatter.formatMacro(grams: current, unitSystem: unitSystem))")
+                        .font(DesignSystem.Typography.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                    
+                    Text("of \(MassUnitFormatter.formatMacro(grams: goal, unitSystem: unitSystem))")
+                        .font(DesignSystem.Typography.caption2)
+                        .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
+                }
             }
-            .font(.caption)
             
-            let barColor: Color = overflowAmount > 0 ? .red : color
-            ProgressView(value: min(progress, 1))
-                .progressViewStyle(LinearProgressViewStyle(tint: barColor))
+            // Progress bar with gradient
+            ZStack(alignment: .leading) {
+                // Background track
+                RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
+                    .fill(DesignSystem.Colors.adaptiveSurface())
+                    .frame(height: 8)
+                
+                // Progress fill with gradient
+                RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
+                    .fill(
+                        LinearGradient(
+                            colors: overflowAmount > 0 ? 
+                                [DesignSystem.Colors.error.opacity(0.8), DesignSystem.Colors.error] :
+                                [color.opacity(0.8), color],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: CGFloat(min(progress, 1)) * UIScreen.main.bounds.width * 0.7, height: 8)
+                    .animation(DesignSystem.Animation.standard, value: progress)
+                
+                // Overflow indicator
+                if overflowAmount > 0 {
+                    RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
+                        .fill(DesignSystem.Colors.error)
+                        .frame(width: min(CGFloat(overflowAmount) * UIScreen.main.bounds.width * 0.7, UIScreen.main.bounds.width * 0.7), height: 8)
+                        .animation(DesignSystem.Animation.standard, value: overflowAmount)
+                }
+            }
+            
+            // Overflow text
             if overflowAmount > 0 {
-                Text("Over by \(MassUnitFormatter.formatMacro(grams: overflowAmount, unitSystem: unitSystem))")
-                    .font(.caption2)
-                    .foregroundColor(.red)
+                HStack {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.caption2)
+                        .foregroundColor(DesignSystem.Colors.error)
+                    
+                    Text("Over by \(MassUnitFormatter.formatMacro(grams: overflowAmount, unitSystem: unitSystem))")
+                        .font(DesignSystem.Typography.caption2)
+                        .foregroundColor(DesignSystem.Colors.error)
+                    
+                    Spacer()
+                }
+                .padding(.top, DesignSystem.Spacing.xs)
             }
         }
+        .padding(DesignSystem.Spacing.md)
+        .metricCardStyle()
         .accessibilityElement(children: .combine)
         .accessibilityLabel(name)
         .accessibilityValue(accessibilityValueText)

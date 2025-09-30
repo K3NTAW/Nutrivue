@@ -5,6 +5,7 @@ struct SupplementsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var supplements: [Supplement]
     @State private var showingAddSupplement = false
+    @State private var selectedSupplement: Supplement?
     @State private var searchQuery = ""
     
     private var filteredSupplements: [Supplement] {
@@ -17,45 +18,195 @@ struct SupplementsView: View {
     
     var body: some View {
         NavigationView {
-            List {
-                ForEach(filteredSupplements) { supp in
-                    NavigationLink(destination: EditSupplementView(supplement: supp)) {
-                        SupplementRowView(supplement: supp)
-                    }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button {
-                            toggleTakenToday(for: supp)
-                        } label: {
-                            Label(supp.wasTakenToday() ? "Unmark" : "Mark Taken", systemImage: supp.wasTakenToday() ? "arrow.uturn.backward.circle" : "checkmark.circle")
+            ZStack {
+                // Background
+                DesignSystem.Colors.adaptiveBackground()
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Header
+                    VStack(spacing: 16) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Supplements")
+                                    .font(.system(size: 28, weight: .bold, design: .default))
+                                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                                    .kerning(-0.3)
+                                
+                                Text("Track your supplement routine")
+                                    .font(.system(size: 17, weight: .medium, design: .default))
+                                    .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
+                                    .opacity(0.85)
+                                    .kerning(0.1)
+                            }
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                showingAddSupplement = true
+                            }) {
+                                ZStack {
+                                    Circle()
+                                        .fill(DesignSystem.Colors.accent)
+                                        .frame(width: 44, height: 44)
+                                    
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 20, weight: .semibold))
+                                        .foregroundColor(.white)
+                                }
+                            }
                         }
-                        .tint(.accentColor)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 24)
+                    }
+                    
+                    if supplements.isEmpty {
+                        // Empty State
+                        VStack(spacing: 24) {
+                            ZStack {
+                                Circle()
+                                    .fill(DesignSystem.Colors.accent.opacity(0.1))
+                                    .frame(width: 120, height: 120)
+                                
+                                Image(systemName: "pills")
+                                    .font(.system(size: 48, weight: .medium))
+                                    .foregroundColor(DesignSystem.Colors.accent)
+                            }
+                            
+                            VStack(spacing: 12) {
+                                Text("No Supplements Yet")
+                                    .font(.system(size: 24, weight: .bold, design: .default))
+                                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                                    .kerning(-0.3)
+                                
+                                Text("Start building your supplement routine by adding your first supplement")
+                                    .font(.system(size: 16, weight: .medium, design: .default))
+                                    .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
+                                    .multilineTextAlignment(.center)
+                                    .kerning(0.1)
+                                    .opacity(0.8)
+                            }
+                            
+                            Button(action: {
+                                showingAddSupplement = true
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 18, weight: .semibold))
+                                    
+                                    Text("Add Supplement")
+                                        .font(.system(size: 18, weight: .semibold))
+                                }
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 16)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [DesignSystem.Colors.accent, DesignSystem.Colors.accent.opacity(0.8)],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
+                                        .shadow(
+                                            color: DesignSystem.Colors.accent.opacity(0.3),
+                                            radius: 8,
+                                            x: 0,
+                                            y: 4
+                                        )
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 48)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else if filteredSupplements.isEmpty && !searchQuery.isEmpty {
+                        // No Search Results
+                        VStack(spacing: 24) {
+                            ZStack {
+                                Circle()
+                                    .fill(DesignSystem.Colors.adaptiveTertiaryText().opacity(0.1))
+                                    .frame(width: 120, height: 120)
+                                
+                                Image(systemName: "magnifyingglass")
+                                    .font(.system(size: 48, weight: .medium))
+                                    .foregroundColor(DesignSystem.Colors.adaptiveTertiaryText())
+                            }
+                            
+                            VStack(spacing: 12) {
+                                Text("No Results Found")
+                                    .font(.system(size: 24, weight: .bold, design: .default))
+                                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                                    .kerning(-0.3)
+                                
+                                Text("No supplements found for '\(searchQuery)'")
+                                    .font(.system(size: 16, weight: .medium, design: .default))
+                                    .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
+                                    .multilineTextAlignment(.center)
+                                    .kerning(0.1)
+                                    .opacity(0.8)
+                            }
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 48)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        // Supplements List
+                        List {
+                            ForEach(filteredSupplements) { supplement in
+                                SupplementCardView(
+                                    supplement: supplement,
+                                    onToggle: { toggleTakenToday(for: supplement) },
+                                    onEdit: { 
+                                        selectedSupplement = supplement
+                                    }
+                                )
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    Button {
+                                        toggleTakenToday(for: supplement)
+                                    } label: {
+                                        Label(supplement.wasTakenToday() ? "Unmark" : "Mark Taken", systemImage: supplement.wasTakenToday() ? "arrow.uturn.backward.circle" : "checkmark.circle")
+                                    }
+                                    .tint(DesignSystem.Colors.accent)
+                                    
+                                    Button(role: .destructive) {
+                                        deleteSupplement(supplement)
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
+                                .contextMenu {
+                                    Button {
+                                        toggleTakenToday(for: supplement)
+                                    } label: {
+                                        Label(supplement.wasTakenToday() ? "Unmark" : "Mark Taken", systemImage: supplement.wasTakenToday() ? "arrow.uturn.backward.circle" : "checkmark.circle")
+                                    }
+                                    
+                                    Button(role: .destructive) {
+                                        deleteSupplement(supplement)
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(EdgeInsets(top: 0, leading: 24, bottom: 16, trailing: 24))
+                            }
+                        }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
+                        .padding(.top, 16)
                     }
                 }
-                .onDelete(perform: delete)
-
-                if supplements.isEmpty {
-                    ContentUnavailableView("No Supplements", systemImage: "pills", description: Text("Tap the + button to add your first supplement."))
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .listRowBackground(Color.clear)
-                } else if filteredSupplements.isEmpty && !searchQuery.isEmpty {
-                    ContentUnavailableView.search(text: searchQuery)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .listRowBackground(Color.clear)
-                }
             }
-            .navigationTitle("Supplements")
+            .navigationBarHidden(true)
             .searchable(text: $searchQuery)
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showingAddSupplement = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
             .sheet(isPresented: $showingAddSupplement) {
                 AddSupplementView()
+            }
+            .sheet(item: $selectedSupplement) { supplement in
+                EditSupplementView(supplement: supplement)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .quickAddSupplement)) { _ in
@@ -81,6 +232,101 @@ struct SupplementsView: View {
             let supp = supplements[index]
             NotificationService().cancelSupplementReminder(for: supp)
             modelContext.delete(supp)
+        }
+    }
+    
+    private func deleteSupplement(_ supplement: Supplement) {
+        NotificationService().cancelSupplementReminder(for: supplement)
+        modelContext.delete(supplement)
+    }
+}
+
+// MARK: - Helper Views
+private struct SupplementCardView: View {
+    let supplement: Supplement
+    let onToggle: () -> Void
+    let onEdit: () -> Void
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Status Indicator
+            ZStack {
+                Circle()
+                    .fill(supplement.wasTakenToday() ? DesignSystem.Colors.success.opacity(0.2) : DesignSystem.Colors.accent.opacity(0.2))
+                    .frame(width: 44, height: 44)
+                
+                Image(systemName: supplement.wasTakenToday() ? "checkmark" : "pills")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(supplement.wasTakenToday() ? DesignSystem.Colors.success : DesignSystem.Colors.accent)
+            }
+            
+            // Supplement Info
+            VStack(alignment: .leading, spacing: 6) {
+                Text(supplement.name)
+                    .font(.system(size: 16, weight: .semibold, design: .default))
+                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                    .kerning(0.2)
+                    .lineLimit(2)
+                
+                HStack(spacing: 8) {
+                    if let dosage = supplement.dosage, !dosage.isEmpty {
+                        Text(dosage)
+                            .font(.system(size: 12, weight: .medium, design: .default))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(DesignSystem.Colors.adaptiveSurface().opacity(0.6))
+                            )
+                            .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
+                            .kerning(0.1)
+                    }
+                    
+                    if let timeComponents = supplement.timeComponents(),
+                       let hour = timeComponents.hour,
+                       let minute = timeComponents.minute {
+                        Text(String(format: "%02d:%02d", hour, minute))
+                            .font(.system(size: 12, weight: .medium, design: .default))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(DesignSystem.Colors.adaptiveSurface().opacity(0.6))
+                            )
+                            .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
+                            .kerning(0.1)
+                    }
+                }
+            }
+            
+            Spacer()
+            
+            // Action Button
+            Button(action: onToggle) {
+                ZStack {
+                    Circle()
+                        .fill(supplement.wasTakenToday() ? DesignSystem.Colors.success : DesignSystem.Colors.adaptiveSurface())
+                        .frame(width: 36, height: 36)
+                    
+                    Image(systemName: supplement.wasTakenToday() ? "checkmark" : "plus")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(supplement.wasTakenToday() ? .white : DesignSystem.Colors.adaptiveSecondaryText())
+                }
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(DesignSystem.Colors.adaptiveCardBackground())
+                .shadow(
+                    color: .black.opacity(0.08),
+                    radius: 8,
+                    x: 0,
+                    y: 4
+                )
+        )
+        .onTapGesture {
+            onEdit()
         }
     }
 }
@@ -239,6 +485,7 @@ private struct SupplementRowView: View {
         return syms[weekday - 1]
     }
 }
+
 
 
 

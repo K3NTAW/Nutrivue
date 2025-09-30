@@ -19,22 +19,86 @@ struct HistoryView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    Picker("Range", selection: $daysRange) {
-                        Text("7d").tag(7)
-                        Text("14d").tag(14)
-                        Text("30d").tag(30)
+            ZStack {
+                // Background
+                DesignSystem.Colors.adaptiveBackground()
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: DesignSystem.Spacing.lg) {
+                        // Time Range Picker
+                        VStack(alignment: .leading, spacing: DesignSystem.Spacing.sm) {
+                            HStack {
+                                Image(systemName: "calendar")
+                                    .foregroundColor(DesignSystem.Colors.accent)
+                                    .font(.title3)
+                                
+                                Text("Time Range")
+                                    .font(DesignSystem.Typography.title3)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                                
+                                Spacer()
+                            }
+                            .padding(.horizontal, DesignSystem.Spacing.md)
+                            
+                            Picker("Range", selection: $daysRange) {
+                                Text("7 days").tag(7)
+                                Text("14 days").tag(14)
+                                Text("30 days").tag(30)
+                            }
+                            .pickerStyle(.segmented)
+                            .padding(.horizontal, DesignSystem.Spacing.md)
+                        }
+                        
+                        // Calorie Chart
+                        VStack(alignment: .leading, spacing: DesignSystem.Spacing.sm) {
+                            HStack {
+                                Image(systemName: "chart.line.uptrend.xyaxis")
+                                    .foregroundColor(DesignSystem.Colors.accent)
+                                    .font(.title3)
+                                
+                                Text("Calorie Intake")
+                                    .font(DesignSystem.Typography.title3)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                                
+                                Spacer()
+                            }
+                            .padding(.horizontal, DesignSystem.Spacing.md)
+                            
+                            CalorieChartView(logs: logsForRange, lowerBand: lowerBand, upperBand: upperBand)
+                                .frame(height: 220)
+                                .padding(.horizontal, DesignSystem.Spacing.md)
+                                .dataCardStyle()
+                                .accessibilityLabel("Calories chart last \(daysRange) days")
+                        }
+                        
+                        // Supplement Adherence
+                        VStack(alignment: .leading, spacing: DesignSystem.Spacing.sm) {
+                            HStack {
+                                Image(systemName: "pills.fill")
+                                    .foregroundColor(DesignSystem.Colors.accent)
+                                    .font(.title3)
+                                
+                                Text("Supplement Adherence")
+                                    .font(DesignSystem.Typography.title3)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                                
+                                Spacer()
+                            }
+                            .padding(.horizontal, DesignSystem.Spacing.md)
+                            
+                            AdherenceRow(logs: logsForRange)
+                                .padding(.horizontal, DesignSystem.Spacing.md)
+                                .accessibilityLabel("Supplement adherence last \(daysRange) days")
+                        }
+                        
+                        Spacer(minLength: DesignSystem.Spacing.xxxl)
                     }
-                    .pickerStyle(.segmented)
-                    
-                    CalorieChartView(logs: logsForRange, lowerBand: lowerBand, upperBand: upperBand)
-                        .frame(height: 220)
-                        .accessibilityLabel("Calories chart last \(daysRange) days")
-                    AdherenceRow(logs: logsForRange)
-                        .accessibilityLabel("Supplement adherence last \(daysRange) days")
+                    .padding(.top, DesignSystem.Spacing.sm)
                 }
-                .padding()
             }
             .navigationTitle("History")
         }

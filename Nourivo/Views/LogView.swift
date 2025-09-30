@@ -30,20 +30,28 @@ struct LogView: View {
     
     var body: some View {
         NavigationView {
-            mealsList
-            .listStyle(.insetGrouped)
+            ZStack {
+                // Background
+                DesignSystem.Colors.adaptiveBackground()
+                    .ignoresSafeArea()
+                
+                mealsList
+            }
             .navigationTitle("Log")
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button(action: {
                         showingGlobalMealPicker = true
                     }) {
                         Image(systemName: "plus")
+                            .foregroundColor(DesignSystem.Colors.accent)
                     }
                     Button(action: {
                         showingScannerSheet = true
                     }) {
                         Image(systemName: "barcode.viewfinder")
+                            .foregroundColor(DesignSystem.Colors.accent)
                     }
                 }
             }
@@ -240,24 +248,28 @@ struct LogView: View {
     }
     
     private var mealsList: some View {
-        List {
-            ForEach(todaysMeals) { meal in
-                MealSectionView(
-                    meal: meal,
-                    unitSystem: unitSystem,
-                    onAddRecipe: {
-                        mealForRecipe = meal
-                        showingRecipePicker = true
-                    },
-                    onAddFood: {
-                        mealForSearch = meal
-                    },
-                    onDeleteItems: { indexSet in
-                        deleteFoodItem(from: meal, at: indexSet)
-                    },
-                    onTapItem: { item in presentAdjustServing(for: item, in: meal) }
-                )
+        ScrollView {
+            LazyVStack(spacing: DesignSystem.Spacing.lg) {
+                ForEach(todaysMeals) { meal in
+                    MealSectionView(
+                        meal: meal,
+                        unitSystem: unitSystem,
+                        onAddRecipe: {
+                            mealForRecipe = meal
+                            showingRecipePicker = true
+                        },
+                        onAddFood: {
+                            mealForSearch = meal
+                        },
+                        onDeleteItems: { indexSet in
+                            deleteFoodItem(from: meal, at: indexSet)
+                        },
+                        onTapItem: { item in presentAdjustServing(for: item, in: meal) }
+                    )
+                }
             }
+            .padding(.horizontal, DesignSystem.Spacing.md)
+            .padding(.top, DesignSystem.Spacing.sm)
         }
     }
     
@@ -302,13 +314,60 @@ private struct FoodRow: View {
     private var unitSystem: UnitSystem { users.first?.unitSystem ?? .metric }
     let item: FoodItem
     var body: some View {
-        HStack {
-            Text(item.name)
+        HStack(spacing: DesignSystem.Spacing.md) {
+            // Food icon
+            Image(systemName: "fork.knife")
+                .foregroundColor(DesignSystem.Colors.accent)
+                .font(.title3)
+                .frame(width: 24, height: 24)
+            
+            // Food details
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.xs) {
+                Text(item.name)
+                    .font(DesignSystem.Typography.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                    .lineLimit(1)
+                
+                HStack(spacing: DesignSystem.Spacing.sm) {
+                    if item.protein > 0 {
+                        Text("P: \(String(format: "%.1f", item.protein))g")
+                            .font(DesignSystem.Typography.caption2)
+                            .foregroundColor(DesignSystem.Colors.protein)
+                    }
+                    if item.carbohydrates > 0 {
+                        Text("C: \(String(format: "%.1f", item.carbohydrates))g")
+                            .font(DesignSystem.Typography.caption2)
+                            .foregroundColor(DesignSystem.Colors.carbs)
+                    }
+                    if item.fat > 0 {
+                        Text("F: \(String(format: "%.1f", item.fat))g")
+                            .font(DesignSystem.Typography.caption2)
+                            .foregroundColor(DesignSystem.Colors.fat)
+                    }
+                }
+            }
+            
             Spacer()
-            Text(String(format: "%.0f kcal", item.calories))
-                .foregroundColor(.secondary)
+            
+            // Calories
+            VStack(alignment: .trailing, spacing: DesignSystem.Spacing.xs) {
+                Text("\(String(format: "%.0f", item.calories))")
+                    .font(DesignSystem.Typography.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                
+                Text("kcal")
+                    .font(DesignSystem.Typography.caption2)
+                    .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, DesignSystem.Spacing.sm)
+        .padding(.horizontal, DesignSystem.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
+                .fill(DesignSystem.Colors.adaptiveSurface().opacity(0.5))
+        )
         .contentShape(Rectangle())
     }
 }
@@ -325,6 +384,52 @@ private struct MacroPill: View {
     }
 }
 
+// MARK: - Helper Views
+private struct MealHeaderView: View {
+    let meal: Meal
+    let unitSystem: UnitSystem
+    let onAddRecipe: () -> Void
+    let onAddFood: () -> Void
+    
+    private var totalCalories: Double {
+        meal.items.reduce(0) { $0 + $1.calories }
+    }
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.xs) {
+                Text(meal.name)
+                    .font(DesignSystem.Typography.title3)
+                    .fontWeight(.semibold)
+                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                
+                Text("\(meal.items.count) items • \(String(format: "%.0f", totalCalories)) kcal")
+                    .font(DesignSystem.Typography.caption)
+                    .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
+            }
+            
+            Spacer()
+            
+            // Add buttons
+            HStack(spacing: DesignSystem.Spacing.sm) {
+                Button(action: onAddFood) {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(DesignSystem.Colors.accent)
+                        .font(.title3)
+                }
+                
+                Button(action: onAddRecipe) {
+                    Image(systemName: "book.circle.fill")
+                        .foregroundColor(DesignSystem.Colors.accent)
+                        .font(.title3)
+                }
+            }
+        }
+        .padding(.horizontal, DesignSystem.Spacing.md)
+        .padding(.top, DesignSystem.Spacing.md)
+    }
+}
+
 private struct MealSectionView: View {
     let meal: Meal
     let unitSystem: UnitSystem
@@ -333,24 +438,92 @@ private struct MealSectionView: View {
     let onDeleteItems: (IndexSet) -> Void
     let onTapItem: (FoodItem) -> Void
     
+    private var totalCalories: Double {
+        meal.items.reduce(0) { $0 + $1.calories }
+    }
+    
     var body: some View {
-        Section {
-            ForEach(meal.items) { item in
-                Button { onTapItem(item) } label: { FoodRow(item: item) }
-                    .buttonStyle(.plain)
-                    .contentShape(Rectangle())
+        VStack(alignment: .leading, spacing: DesignSystem.Spacing.md) {
+            // Meal Header
+            HStack {
+                VStack(alignment: .leading, spacing: DesignSystem.Spacing.xs) {
+                    Text(meal.name)
+                        .font(DesignSystem.Typography.title3)
+                        .fontWeight(.semibold)
+                        .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                    
+                    Text("\(meal.items.count) items • \(String(format: "%.0f", totalCalories)) kcal")
+                        .font(DesignSystem.Typography.caption)
+                        .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
+                }
+                
+                Spacer()
+                
+                // Add buttons
+                HStack(spacing: DesignSystem.Spacing.sm) {
+                    Button(action: onAddFood) {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(DesignSystem.Colors.accent)
+                            .font(.title3)
+                    }
+                    
+                    Button(action: onAddRecipe) {
+                        Image(systemName: "book.circle.fill")
+                            .foregroundColor(DesignSystem.Colors.accent)
+                            .font(.title3)
+                    }
+                }
             }
-            .onDelete(perform: onDeleteItems)
-        } header: {
-            Text(meal.name)
-        } footer: {
-            MealFooter(
-                meal: meal,
-                unitSystem: unitSystem,
-                onAddRecipe: onAddRecipe,
-                onAddFood: onAddFood
-            )
+            .padding(.horizontal, DesignSystem.Spacing.md)
+            .padding(.top, DesignSystem.Spacing.md)
+            
+            // Food Items
+            if meal.items.isEmpty {
+                VStack(spacing: DesignSystem.Spacing.sm) {
+                    Image(systemName: "fork.knife")
+                        .font(.title2)
+                        .foregroundColor(DesignSystem.Colors.adaptiveTertiaryText())
+                    
+                    Text("No items yet")
+                        .font(DesignSystem.Typography.subheadline)
+                        .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, DesignSystem.Spacing.xl)
+            } else {
+                VStack(spacing: DesignSystem.Spacing.xs) {
+                    ForEach(Array(meal.items.enumerated()), id: \.element.id) { index, item in
+                        HStack {
+                            Button { onTapItem(item) } label: { 
+                                FoodRow(item: item) 
+                            }
+                            .buttonStyle(.plain)
+                            .contentShape(Rectangle())
+                            
+                            Spacer()
+                            
+                            Button {
+                                onDeleteItems(IndexSet(integer: index))
+                            } label: {
+                                Image(systemName: "trash")
+                                    .foregroundColor(.red)
+                                    .font(.title3)
+                            }
+                            .buttonStyle(.plain)
+                            .opacity(0.7)
+                        }
+                        .contextMenu {
+                            Button("Delete", role: .destructive) {
+                                onDeleteItems(IndexSet(integer: index))
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, DesignSystem.Spacing.md)
+                .padding(.bottom, DesignSystem.Spacing.md)
+            }
         }
+        .dataCardStyle()
     }
 }
 
