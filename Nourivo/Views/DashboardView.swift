@@ -2,11 +2,13 @@ import SwiftUI
 import SwiftData
 
 struct DashboardView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query private var users: [User]
     private var user: User? { users.first }
     
     @Query(sort: \Meal.date) private var meals: [Meal]
     @Query private var supplements: [Supplement]
+    @Query private var waterIntakes: [WaterIntake]
     private var todaysMeals: [Meal] {
         meals.filter { Calendar.current.isDateInToday($0.date) }
     }
@@ -40,6 +42,14 @@ struct DashboardView: View {
         todaysMeals.flatMap { $0.items }.reduce(0) { $0 + $1.fat }
     }
     
+    private var totalWaterToday: Double {
+        WaterIntake.totalToday(intakes: waterIntakes)
+    }
+    
+    private var waterGoal: Double {
+        2000.0 // 2 liters default goal
+    }
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -48,7 +58,7 @@ struct DashboardView: View {
                     .ignoresSafeArea()
                 
             ScrollView {
-                    VStack(spacing: DesignSystem.Spacing.lg) {
+                    VStack(spacing: 32) {
                         // Header with greeting (Ultrahuman style)
                         VStack(alignment: .leading, spacing: 6) {
                     Text(greeting)
@@ -91,7 +101,7 @@ struct DashboardView: View {
                                         Spacer()
                                         
                                         // Circular progress indicator
-                                        ZStack {
+                        ZStack {
                                             // Background ring
                                             Circle()
                                                 .stroke(.white.opacity(0.25), lineWidth: 8)
@@ -266,6 +276,186 @@ struct DashboardView: View {
                             )
                             .padding(.horizontal, 20)
                             
+                            // Water Tracking Card (Ultrahuman style)
+                            VStack(spacing: 0) {
+                                // Card Header
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Hydration")
+                                            .font(.system(size: 18, weight: .semibold, design: .default))
+                                            .foregroundColor(.white)
+                                            .kerning(0.3)
+                                        
+                                        Text("Daily water intake")
+                                            .font(.system(size: 14, weight: .medium, design: .default))
+                                            .foregroundColor(.white.opacity(0.85))
+                                            .kerning(0.1)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    // Water amount indicator
+                                    VStack(alignment: .trailing, spacing: 2) {
+                                        Text("\(String(format: "%.0f", totalWaterToday))")
+                                            .font(.system(size: 24, weight: .bold, design: .default))
+                                            .foregroundColor(.white)
+                                            .kerning(-0.5)
+                                        
+                                        Text("ml")
+                                            .font(.system(size: 12, weight: .regular, design: .default))
+                                            .foregroundColor(.white.opacity(0.7))
+                                            .kerning(0.5)
+                                    }
+                                }
+                                .padding(.horizontal, 24)
+                                .padding(.top, 24)
+                                
+                                // Quick Add Buttons with better spacing
+                                VStack(spacing: 12) {
+                                    HStack(spacing: 0) {
+                                        Button(action: {
+                                            addWater(amount: 250)
+                                        }) {
+                                            VStack(spacing: 2) {
+                                                Text("250")
+                                                    .font(.system(size: 16, weight: .bold, design: .default))
+                                                    .foregroundColor(.white)
+                                                    .kerning(-0.2)
+                                                
+                                                Text("ml")
+                                                    .font(.system(size: 10, weight: .medium, design: .default))
+                                                    .foregroundColor(.white.opacity(0.8))
+                                                    .kerning(0.3)
+                                            }
+                                            .frame(maxWidth: .infinity, minHeight: 44)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .fill(.white.opacity(0.15))
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 12)
+                                                            .stroke(.white.opacity(0.3), lineWidth: 1)
+                                                    )
+                                            )
+                                        }
+                                        
+                                        Spacer()
+                                            .frame(width: 12)
+                                        
+                                        Button(action: {
+                                            addWater(amount: 500)
+                                        }) {
+                                            VStack(spacing: 2) {
+                                                Text("500")
+                                                    .font(.system(size: 16, weight: .bold, design: .default))
+                                                    .foregroundColor(.white)
+                                                    .kerning(-0.2)
+                                                
+                                                Text("ml")
+                                                    .font(.system(size: 10, weight: .medium, design: .default))
+                                                    .foregroundColor(.white.opacity(0.8))
+                                                    .kerning(0.3)
+                                            }
+                                            .frame(maxWidth: .infinity, minHeight: 44)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .fill(.white.opacity(0.15))
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 12)
+                                                            .stroke(.white.opacity(0.3), lineWidth: 1)
+                                                    )
+                                            )
+                                        }
+                                        
+                                        Spacer()
+                                            .frame(width: 12)
+                                        
+                                        Button(action: {
+                                            addWater(amount: 1000)
+                                        }) {
+                                            VStack(spacing: 2) {
+                                                Text("1L")
+                                                    .font(.system(size: 16, weight: .bold, design: .default))
+                                                    .foregroundColor(.white)
+                                                    .kerning(-0.2)
+                                                
+                                                Text("liter")
+                                                    .font(.system(size: 10, weight: .medium, design: .default))
+                                                    .foregroundColor(.white.opacity(0.8))
+                                                    .kerning(0.3)
+                                            }
+                                            .frame(maxWidth: .infinity, minHeight: 44)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .fill(.white.opacity(0.15))
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 12)
+                                                            .stroke(.white.opacity(0.3), lineWidth: 1)
+                                                    )
+                                            )
+                                        }
+                                    }
+                                    .padding(.top, 16)
+                                    
+                                    // Progress text and bar with better styling
+                        VStack(spacing: 12) {
+                                        Text("\(String(format: "%.0f", totalWaterToday)) of \(String(format: "%.0f", waterGoal)) ml")
+                                            .font(.system(size: 14, weight: .semibold, design: .default))
+                                            .foregroundColor(.white.opacity(0.9))
+                                            .kerning(0.1)
+                                        
+                                        // Enhanced progress bar
+                                        GeometryReader { geometry in
+                                            ZStack(alignment: .leading) {
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .fill(.white.opacity(0.15))
+                                                    .frame(height: 10)
+                                                
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .fill(
+                                                        LinearGradient(
+                                                            colors: [.white, .cyan.opacity(0.9)],
+                                                            startPoint: .leading,
+                                                            endPoint: .trailing
+                                                        )
+                                                    )
+                                                    .frame(width: geometry.size.width * min(totalWaterToday / waterGoal, 1.0), height: 10)
+                                                    .animation(.easeInOut(duration: 1.0), value: totalWaterToday)
+                                                
+                                                // Progress percentage overlay
+                                                if totalWaterToday > 0 {
+                                                    HStack {
+                                                        Spacer()
+                                                        Text("\(String(format: "%.0f", (totalWaterToday / waterGoal) * 100))%")
+                                                            .font(.system(size: 10, weight: .bold, design: .default))
+                                                            .foregroundColor(.white.opacity(0.8))
+                                                            .kerning(0.2)
+                                                            .padding(.trailing, 8)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .frame(height: 10)
+                                    }
+                                }
+                                .padding(.horizontal, 24)
+                                .padding(.bottom, 24)
+                            }
+                            .background(
+                                RoundedRectangle(cornerRadius: 24)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [
+                                                Color(red: 0.0, green: 0.4, blue: 0.8),
+                                                Color(red: 0.0, green: 0.6, blue: 1.0)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .shadow(color: Color(red: 0.0, green: 0.4, blue: 0.8).opacity(0.3), radius: 12, x: 0, y: 6)
+                            )
+                            .padding(.horizontal, 20)
+                            
                             // Supplements Card (Ultrahuman style)
                             VStack(spacing: 0) {
                                 // Card Header
@@ -314,16 +504,16 @@ struct DashboardView: View {
                                     }
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 40)
-                                } else {
-                                    VStack(spacing: 16) {
-                                ForEach(supplementsForToday) { supp in
-                                            SupplementItemView(supplement: supp)
-                                        }
+                            } else {
+                                VStack(spacing: 16) {
+                                    ForEach(supplementsForToday) { supp in
+                                        SupplementItemView(supplement: supp)
                                     }
-                                    .padding(.horizontal, 24)
-                                    .padding(.top, 16)
-                                    .padding(.bottom, 24)
                                 }
+                                .padding(.horizontal, 24)
+                                .padding(.top, 16)
+                                .padding(.bottom, 24)
+                            }
                             }
                             .background(
                                 RoundedRectangle(cornerRadius: 24)
@@ -389,6 +579,11 @@ struct DashboardView: View {
 private extension DashboardView {
     var supplementsForToday: [Supplement] {
         supplements.filter { $0.isScheduledForToday() }
+    }
+    
+    func addWater(amount: Double) {
+        let intake = WaterIntake(amount: amount)
+        modelContext.insert(intake)
     }
 }
 
@@ -499,50 +694,50 @@ private struct SupplementItemView: View {
     @State private var isTaken: Bool = false
     
     var body: some View {
-        HStack(spacing: 20) {
-            // Status indicator
-            ZStack {
-                Circle()
-                    .fill(isTaken ? .white.opacity(0.25) : .white.opacity(0.1))
-                    .frame(width: 44, height: 44)
-                
-                Image(systemName: isTaken ? "checkmark" : "capsule")
-                    .foregroundColor(.white)
-                    .font(.system(size: 18, weight: .semibold))
-            }
-            
-            // Content
-            VStack(alignment: .leading, spacing: 6) {
-                Text(supplement.name)
-                    .font(.system(size: 17, weight: .semibold, design: .default))
-                    .foregroundColor(.white)
-                    .kerning(0.2)
-                
-                HStack(spacing: 12) {
-                    if let dosage = supplement.dosage, !dosage.isEmpty {
-                        Text(dosage)
-                            .font(.system(size: 15, weight: .medium, design: .default))
-                            .foregroundColor(.white.opacity(0.9))
-                            .kerning(0.1)
-                    }
+        Button(action: { 
+            withAnimation(.easeInOut(duration: 0.4)) { 
+                toggleTaken() 
+            } 
+        }) {
+            HStack(spacing: 20) {
+                // Status indicator
+                ZStack {
+                    Circle()
+                        .fill(isTaken ? .white.opacity(0.25) : .white.opacity(0.1))
+                        .frame(width: 44, height: 44)
                     
-                    if let t = supplement.timeComponents(), let hour = t.hour, let minute = t.minute {
-                        Text(String(format: "%02d:%02d", hour, minute))
-                            .font(.system(size: 15, weight: .medium, design: .default))
-                            .foregroundColor(.white.opacity(0.9))
-                            .kerning(0.1)
+                    Image(systemName: isTaken ? "checkmark" : "capsule")
+                        .foregroundColor(.white)
+                        .font(.system(size: 18, weight: .semibold))
+                }
+                
+                // Content
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(supplement.name)
+                        .font(.system(size: 17, weight: .semibold, design: .default))
+                        .foregroundColor(.white)
+                        .kerning(0.2)
+                    
+                    HStack(spacing: 12) {
+                        if let dosage = supplement.dosage, !dosage.isEmpty {
+                            Text(dosage)
+                                .font(.system(size: 15, weight: .medium, design: .default))
+                                .foregroundColor(.white.opacity(0.9))
+                                .kerning(0.1)
+                        }
+                        
+                        if let t = supplement.timeComponents(), let hour = t.hour, let minute = t.minute {
+                            Text(String(format: "%02d:%02d", hour, minute))
+                                .font(.system(size: 15, weight: .medium, design: .default))
+                                .foregroundColor(.white.opacity(0.9))
+                                .kerning(0.1)
+                        }
                     }
                 }
-            }
-            
-            Spacer()
-            
-            // Action button
-            Button(action: { 
-                withAnimation(.easeInOut(duration: 0.4)) { 
-                    toggleTaken() 
-                } 
-            }) {
+                
+                Spacer()
+                
+                // Action indicator
                 ZStack {
                     Circle()
                         .fill(isTaken ? .white : .white.opacity(0.2))
@@ -553,8 +748,14 @@ private struct SupplementItemView: View {
                         .foregroundColor(isTaken ? .black : .white)
                 }
             }
-            .buttonStyle(.plain)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(.white.opacity(0.1))
+            )
         }
+        .buttonStyle(.plain)
         .onAppear { isTaken = supplement.wasTakenToday() }
     }
     

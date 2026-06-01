@@ -163,13 +163,6 @@ struct SupplementsView: View {
                                     }
                                 )
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                    Button {
-                                        toggleTakenToday(for: supplement)
-                                    } label: {
-                                        Label(supplement.wasTakenToday() ? "Unmark" : "Mark Taken", systemImage: supplement.wasTakenToday() ? "arrow.uturn.backward.circle" : "checkmark.circle")
-                                    }
-                                    .tint(DesignSystem.Colors.accent)
-                                    
                                     Button(role: .destructive) {
                                         deleteSupplement(supplement)
                                     } label: {
@@ -177,12 +170,6 @@ struct SupplementsView: View {
                                     }
                                 }
                                 .contextMenu {
-                                    Button {
-                                        toggleTakenToday(for: supplement)
-                                    } label: {
-                                        Label(supplement.wasTakenToday() ? "Unmark" : "Mark Taken", systemImage: supplement.wasTakenToday() ? "arrow.uturn.backward.circle" : "checkmark.circle")
-                                    }
-                                    
                                     Button(role: .destructive) {
                                         deleteSupplement(supplement)
                                     } label: {
@@ -326,6 +313,9 @@ private struct SupplementCardView: View {
                 )
         )
         .onTapGesture {
+            onToggle()
+        }
+        .onLongPressGesture {
             onEdit()
         }
     }

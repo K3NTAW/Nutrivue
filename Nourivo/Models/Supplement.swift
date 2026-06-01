@@ -66,10 +66,14 @@ extension Supplement {
             return true
         case .specificDays:
             let weekday = calendar.component(.weekday, from: reference)
-            return specificDaysList().contains(weekday)
+            // Convert from Calendar weekday (1=Sunday) to our weekday (1=Monday)
+            let ourWeekday = weekday == 1 ? 7 : weekday - 1
+            return specificDaysList().contains(ourWeekday)
         case .weekly:
             let weekday = calendar.component(.weekday, from: reference)
-            return weeklyWeekday == weekday
+            // Convert from Calendar weekday (1=Sunday) to our weekday (1=Monday)
+            let ourWeekday = weekday == 1 ? 7 : weekday - 1
+            return weeklyWeekday == ourWeekday
         }
     }
     
@@ -80,10 +84,14 @@ extension Supplement {
             return true
         case .specificDays:
             let weekday = calendar.component(.weekday, from: date)
-            return specificDaysList().contains(weekday)
+            // Convert from Calendar weekday (1=Sunday) to our weekday (1=Monday)
+            let ourWeekday = weekday == 1 ? 7 : weekday - 1
+            return specificDaysList().contains(ourWeekday)
         case .weekly:
             let weekday = calendar.component(.weekday, from: date)
-            return weeklyWeekday == weekday
+            // Convert from Calendar weekday (1=Sunday) to our weekday (1=Monday)
+            let ourWeekday = weekday == 1 ? 7 : weekday - 1
+            return weeklyWeekday == ourWeekday
         }
     }
 

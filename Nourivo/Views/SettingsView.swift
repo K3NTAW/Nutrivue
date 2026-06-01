@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var unitSystem: UnitSystem = .metric
     @State private var showingSaveConfirmation = false
     @State private var showingReminderConfirmation = false
+    @State private var showingNavigationSettings = false
     
     var body: some View {
         NavigationView {
@@ -185,6 +186,68 @@ struct SettingsView: View {
                                 .padding(.horizontal, 24)
                             }
                             
+                            // Navigation Settings Section
+                            VStack(alignment: .leading, spacing: 20) {
+                                HStack {
+                                    ZStack {
+                                        Circle()
+                                            .fill(DesignSystem.Colors.accent.opacity(0.2))
+                                            .frame(width: 32, height: 32)
+                                        
+                                        Image(systemName: "list.bullet")
+                                            .font(.system(size: 16, weight: .medium))
+                                            .foregroundColor(DesignSystem.Colors.accent)
+                                    }
+                                    
+                                    Text("Navigation")
+                                        .font(.system(size: 20, weight: .bold, design: .default))
+                                        .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                                        .kerning(0.3)
+                                    
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 24)
+                                
+                                VStack(spacing: 12) {
+                                    Button(action: {
+                                        showingNavigationSettings = true
+                                    }) {
+                                        HStack {
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text("Customize Tabs")
+                                                    .font(.system(size: 16, weight: .semibold, design: .default))
+                                                    .foregroundColor(DesignSystem.Colors.adaptivePrimaryText())
+                                                    .kerning(0.1)
+                                                
+                                                Text("Choose which tabs to show in navigation")
+                                                    .font(.system(size: 13, weight: .medium, design: .default))
+                                                    .foregroundColor(DesignSystem.Colors.adaptiveSecondaryText())
+                                                    .kerning(0.1)
+                                            }
+                                            
+                                            Spacer()
+                                            
+                                            Image(systemName: "chevron.right")
+                                                .font(.system(size: 14, weight: .medium))
+                                                .foregroundColor(DesignSystem.Colors.adaptiveTertiaryText())
+                                        }
+                                        .padding(.horizontal, 20)
+                                        .padding(.vertical, 16)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(DesignSystem.Colors.adaptiveCardBackground())
+                                                .shadow(
+                                                    color: .black.opacity(0.06),
+                                                    radius: 8,
+                                                    x: 0,
+                                                    y: 4
+                                                )
+                                        )
+                                    }
+                                }
+                                .padding(.horizontal, 24)
+                            }
+                            
                             // Goals Section
                             VStack(alignment: .leading, spacing: 20) {
                                 HStack {
@@ -344,6 +407,9 @@ struct SettingsView: View {
                 }
             }
             .navigationBarHidden(true)
+            .sheet(isPresented: $showingNavigationSettings) {
+                NavigationSettingsView()
+            }
             .onAppear {
                 loadUserData()
                 viewModel.refreshHealthKitAuthorizationState()
